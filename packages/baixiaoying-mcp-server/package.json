@@ -1,6 +1,6 @@
 {
-  "name": "@baichuan/baixiaoying-mcp-server",
-  "version": "1.0.0",
+  "name": "@baichuan-ai/baixiaoying-mcp-server",
+  "version": "0.1.0",
   "description": "Baixiaoying MCP Server - 百小应医学大模型 MCP 服务",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,4 +1,4 @@
-# @baichuan/baixiaoying-mcp-server
+# @baichuan-ai/baixiaoying-mcp-server
 
 百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/)。
 
@@ -76,7 +76,7 @@ Baichuan-M3-Plus 是百川智能推出的**最低幻觉循证增强医疗大模�
 ### 安装
 
 ```bash
-npm install @baichuan/baixiaoying-mcp-server
+npm install @baichuan-ai/baixiaoying-mcp-server
 ```
 
 ### 环境变量
@@ -94,7 +94,7 @@ npm install @baichuan/baixiaoying-mcp-server
   "mcpServers": {
     "baixiaoying": {
       "command": "npx",
-      "args": ["-y", "@baichuan/baixiaoying-mcp-server"],
+      "args": ["-y", "@baichuan-ai/baixiaoying-mcp-server"],
       "env": {
         "BAICHUAN_API_KEY": "your-api-key-here"
       }

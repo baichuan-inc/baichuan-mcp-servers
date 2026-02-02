@@ -16,10 +16,12 @@ export const uploadFileInputSchema = {
 };
 
 export function registerUploadFileTool(server: McpServer, client: BaixiaoyingClient | null) {
-  server.tool(
+  server.registerTool(
     "baixiaoying_upload_file",
-    "上传医学文档用于后续的文档问答。支持 pdf、doc、docx、txt、html、md、csv、png、jpg 等格式。",
-    uploadFileInputSchema,
+    {
+      description: "上传医学文档用于后续的文档问答。支持 pdf、doc、docx、txt、html、md、csv、png、jpg 等格式。",
+      inputSchema: uploadFileInputSchema,
+    },
     async (args) => {
       if (!client) {
         return {
@@ -88,10 +90,11 @@ export function registerUploadFileTool(server: McpServer, client: BaixiaoyingCli
 
 // ========== 文件列表工具 ==========
 export function registerListFilesTool(server: McpServer, client: BaixiaoyingClient | null) {
-  server.tool(
+  server.registerTool(
     "baixiaoying_list_files",
-    "获取已上传的文件列表",
-    {},
+    {
+      description: "获取已上传的文件列表",
+    },
     async () => {
       if (!client) {
         return {
@@ -161,10 +164,12 @@ export const getFileStatusInputSchema = {
 };
 
 export function registerGetFileStatusTool(server: McpServer, client: BaixiaoyingClient | null) {
-  server.tool(
+  server.registerTool(
     "baixiaoying_get_file_status",
-    "查询指定文件的解析状态。文件需要解析完成（状态为 online）后才能用于对话。",
-    getFileStatusInputSchema,
+    {
+      description: "查询指定文件的解析状态。文件需要解析完成（状态为 online）后才能用于对话。",
+      inputSchema: getFileStatusInputSchema,
+    },
     async (args) => {
       if (!client) {
         return {
@@ -246,10 +251,12 @@ export const deleteFileInputSchema = {
 };
 
 export function registerDeleteFileTool(server: McpServer, client: BaixiaoyingClient | null) {
-  server.tool(
+  server.registerTool(
     "baixiaoying_delete_file",
-    "删除指定的已上传文件。被知识库使用的文件需要先解除关联后才能删除。",
-    deleteFileInputSchema,
+    {
+      description: "删除指定的已上传文件。被知识库使用的文件需要先解除关联后才能删除。",
+      inputSchema: deleteFileInputSchema,
+    },
     async (args) => {
       if (!client) {
         return {

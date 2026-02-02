@@ -72,11 +72,11 @@ git diff $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-pare
 
 | 包名 | 当前版本 | 新版本 | 变更级别 |
 |------|----------|--------|----------|
-| @baichuan/xxx | 0.0.1 | 0.0.2 | patch |
+| @baichuan-ai/xxx | 0.0.1 | 0.0.2 | patch |
 
 ### Changelog 预览
 
-#### @baichuan/xxx (0.0.1 → 0.0.2)
+#### @baichuan-ai/xxx (0.0.1 → 0.0.2)
 - 修复了 xxx 问题
 - 优化了 xxx 逻辑
 

@@ -46,11 +46,11 @@
 
 ## 📦 MCP Servers
 
-| 包名                                                                  | 描述                                                          | 状态      |
-| --------------------------------------------------------------------- | ------------------------------------------------------------- | --------- |
-| [@baichuan/baixiaoying-mcp-server](./packages/baixiaoying-mcp-server) | 百小应医学大模型 MCP Server，支持医学问答、文档问答、六源循证 | ✅ 已发布 |
+| 包名                                                                     | 描述                                                          | 状态      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------- | --------- |
+| [@baichuan-ai/baixiaoying-mcp-server](./packages/baixiaoying-mcp-server) | 百小应医学大模型 MCP Server，支持医学问答、文档问答、六源循证 | ✅ 已发布 |
 
-### @baichuan/baixiaoying-mcp-server
+### @baichuan-ai/baixiaoying-mcp-server
 
 百小应医学大模型 MCP Server，提供 Baichuan-M3-Plus 和 Baichuan-M2-Plus 模型的对话能力。
 
@@ -65,7 +65,7 @@
 **快速使用：**
 
 ```bash
-npm install @baichuan/baixiaoying-mcp-server
+npm install @baichuan-ai/baixiaoying-mcp-server
 ```
 
 ```json
@@ -73,7 +73,7 @@ npm install @baichuan/baixiaoying-mcp-server
   "mcpServers": {
     "baixiaoying": {
       "command": "npx",
-      "args": ["-y", "@baichuan/baixiaoying-mcp-server"],
+      "args": ["-y", "@baichuan-ai/baixiaoying-mcp-server"],
       "env": {
         "BAICHUAN_API_KEY": "your-api-key-here"
       }
@@ -121,14 +121,14 @@ pnpm build
 pnpm dev
 
 # 单独开发某个包
-pnpm --filter @baichuan/baixiaoying-mcp-server dev
+pnpm --filter @baichuan-ai/baixiaoying-mcp-server dev
 ```
 
 ### 运行 MCP Server
 
 ```bash
 # 直接运行
-pnpm --filter @baichuan/baixiaoying-mcp-server start
+pnpm --filter @baichuan-ai/baixiaoying-mcp-server start
 
 # 或者构建后运行
 node packages/baixiaoying-mcp-server/dist/index.js
