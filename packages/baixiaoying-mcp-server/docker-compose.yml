@@ -1,0 +1,53 @@
+# 百小应 MCP Server Docker Compose 配置
+# 用于快速部署 Streamable HTTP 模式的 MCP 服务
+
+services:
+  baixiaoying-mcp:
+    build:
+      context: ../..
+      dockerfile: packages/baixiaoying-mcp-server/Dockerfile
+    ports:
+      - "8787:8787"
+    environment:
+      # 必需：百川 API Key
+      - BAICHUAN_API_KEY=${BAICHUAN_API_KEY}
+      # 可选：API 请求超时（毫秒）
+      - BAICHUAN_TIMEOUT_MS=${BAICHUAN_TIMEOUT_MS:-120000}
+      # 可选：允许的 Origin 白名单（逗号分隔）
+      - MCP_ALLOWED_ORIGINS=${MCP_ALLOWED_ORIGINS:-http://localhost:*,https://localhost:*}
+      # 可选：允许无 Origin 的请求（CLI/服务端调用）
+      - MCP_ALLOW_EMPTY_ORIGIN=${MCP_ALLOW_EMPTY_ORIGIN:-true}
+      # 可选：Session 过期时间（毫秒）
+      - MCP_SESSION_TTL=${MCP_SESSION_TTL:-1800000}
+      # 可选：协议版本
+      - MCP_PROTOCOL_VERSION=${MCP_PROTOCOL_VERSION:-2025-11-25}
+      - MCP_PROTOCOL_FALLBACK=${MCP_PROTOCOL_FALLBACK:-2025-03-26}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8787/mcp",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # 资源限制（可选）
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+# 可选：添加网络配置
+networks:
+  default:
+    name: baixiaoying-network
