@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>百小应对话结果</title>
+    <style>
+      /* ========== 基础样式重置 ========== */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --primary-color: #ff7918;
+        --primary-light: #fff7f0;
+        --primary-border: #ffe4d0;
+        --text-primary: #262626;
+        --text-secondary: #666666;
+        --text-tertiary: #999999;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f7f8fa;
+        --border-color: #e8e8e8;
+        --link-color: #1677ff;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background: var(--bg-primary);
+        padding: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* ========== 顶部 Logo 区域 ========== */
+      .header {
+        padding: 12px 20px;
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .logo-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .logo-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .logo-text {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-text svg {
+        height: 24px;
+        width: auto;
+        display: block;
+      }
+
+      .header-action {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--primary-color);
+        background: none;
+        border: 1px solid var(--primary-color);
+        padding: 6px 12px;
+        border-radius: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .header-action:hover {
+        background: var(--primary-light);
+      }
+
+      .header-action svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      /* ========== 主内容区域 ========== */
+      .main-content {
+        padding: 16px 20px;
+      }
+
+      /* ========== COT 思考过程区域 ========== */
+      .thinking-section {
+        margin-bottom: 16px;
+      }
+
+      .thinking-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .thinking-toggle {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+      }
+
+      .thinking-toggle.collapsed {
+        transform: rotate(-90deg);
+      }
+
+      .thinking-toggle svg {
+        width: 12px;
+        height: 12px;
+        fill: var(--text-tertiary);
+      }
+
+      .thinking-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .thinking-status-icon {
+        color: var(--primary-color);
+      }
+
+      .thinking-content {
+        padding-left: 24px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .thinking-content.collapsed {
+        max-height: 0;
+      }
+
+      .thinking-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-bottom: 12px;
+      }
+
+      .thinking-step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+
+      .thinking-step-icon {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .thinking-step-icon svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* ========== 回答正文区域 (markdown-body) ========== */
+      .answer-section {
+        margin-bottom: 20px;
+      }
+
+      .answer-content {
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+        color: var(--text-primary);
+        font-family: Lora, -apple-system, "PingFang SC", "Microsoft YaHei",
+          BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial,
+          sans-serif, "Apple Color Emoji", "Segoe UI Emoji", SimHei;
+        font-size: 16px;
+        letter-spacing: 0.4px;
+        line-height: 24px;
+        margin: 0;
+        overflow-wrap: break-word;
+        width: 100%;
+        word-break: break-word;
+      }
+
+      /* Markdown 标题样式 */
+      .answer-content h1,
+      .answer-content h2,
+      .answer-content h3,
+      .answer-content h4 {
+        margin-top: 24px;
+        margin-bottom: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.4;
+      }
+
+      .answer-content h1 {
+        font-size: 22px;
+      }
+
+      .answer-content h2 {
+        font-size: 18px;
+      }
+
+      .answer-content h3 {
+        font-size: 16px;
+      }
+
+      .answer-content h4 {
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .answer-content p {
+        margin-bottom: 16px;
+      }
+
+      .answer-content ul,
+      .answer-content ol {
+        margin-bottom: 16px;
+        padding-left: 24px;
+      }
+
+      .answer-content li {
+        margin-bottom: 8px;
+      }
+
+      .answer-content li > ul,
+      .answer-content li > ol {
+        margin-top: 8px;
+        margin-bottom: 0;
+      }
+
+      .answer-content strong {
+        font-weight: 600;
+      }
+
+      .answer-content em {
+        font-style: italic;
+      }
+
+      /* 表格样式 */
+      .answer-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 14px;
+      }
+
+      .answer-content table th,
+      .answer-content table td {
+        border: 1px solid var(--border-color);
+        padding: 10px 12px;
+        text-align: left;
+        line-height: 1.5;
+      }
+
+      .answer-content table th {
+        background: var(--bg-secondary);
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .answer-content table tr:nth-child(even) {
+        background: var(--bg-secondary);
+      }
+
+      /* 角标样式 (bc-sup) */
+      .citation-ref,
+      bc-sup {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        margin: 0 2px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--primary-color);
+        background: var(--primary-light);
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        vertical-align: super;
+        line-height: 1;
+        transition: background 0.2s ease;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .citation-ref:hover,
+      bc-sup:hover {
+        background: var(--primary-border);
+      }
+
+      /* 引用块样式 */
+      .answer-content blockquote {
+        margin: 16px 0;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-left: 3px solid var(--primary-color);
+        color: var(--text-secondary);
+      }
+
+      /* 代码样式 */
+      .answer-content code {
+        background: var(--bg-secondary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "SF Mono", Monaco, "Courier New", monospace;
+        font-size: 14px;
+      }
+
+      .answer-content pre {
+        background: var(--bg-secondary);
+        padding: 12px 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 16px 0;
+      }
+
+      .answer-content pre code {
+        background: none;
+        padding: 0;
+      }
+
+      /* 水平分割线 */
+      .answer-content hr {
+        border: none;
+        border-top: 1px solid var(--border-color);
+        margin: 24px 0;
+      }
+
+      /* ========== 全部引用区域 ========== */
+      .references-section {
+        border-top: 1px solid var(--border-color);
+        padding-top: 16px;
+      }
+
+      .references-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .references-toggle {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+      }
+
+      .references-toggle.collapsed {
+        transform: rotate(-90deg);
+      }
+
+      .references-toggle svg {
+        width: 12px;
+        height: 12px;
+        fill: var(--text-tertiary);
+      }
+
+      .references-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .references-content {
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .references-content.collapsed {
+        max-height: 0;
+      }
+
+      .references-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding-bottom: 16px;
+      }
+
+      /* 引用条目 */
+      .reference-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 0;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .reference-item:hover {
+        background: var(--bg-secondary);
+        margin: 0 -8px;
+        padding: 8px;
+        border-radius: 8px;
+      }
+
+      /* 第一行：序号 + 类型标签 + 标题 */
+      .reference-row-main {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .reference-num {
+        flex-shrink: 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        line-height: 24px;
+        min-width: 24px;
+      }
+
+      .reference-type-tag {
+        flex-shrink: 0;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--primary-color);
+        background: var(--primary-light);
+        padding: 2px 6px;
+        border-radius: 4px;
+        line-height: 18px;
+        margin-right: 4px;
+      }
+
+      .reference-title-zh {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 24px;
+        flex: 1;
+      }
+
+      .reference-title-zh:hover {
+        color: var(--primary-color);
+      }
+
+      /* 第二行：原文标题 */
+      .reference-row-origin {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding-left: 32px;
+      }
+
+      .reference-title-en {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 18px;
+      }
+
+      /* 第三行：元信息（作者、年份、期刊等） */
+      .reference-row-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-left: 32px;
+      }
+
+      .reference-meta-line {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 18px;
+      }
+
+      /* ========== 底部区域 ========== */
+      .footer {
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+      }
+
+      .footer-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .footer-qr {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 8px;
+        padding: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      .footer-qr canvas,
+      .footer-qr img {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .footer-info {
+        flex: 1;
+      }
+
+      .footer-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+
+      .footer-desc {
+        font-size: 12px;
+        color: var(--text-tertiary);
+        margin-bottom: 8px;
+      }
+
+      .footer-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .footer-feature {
+        font-size: 11px;
+        color: var(--text-secondary);
+        background: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+      }
+
+      .footer-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--primary-color);
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .footer-btn:hover {
+        background: #e66a10;
+        transform: translateY(-1px);
+      }
+
+      .footer-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ========== 加载状态 ========== */
+      .loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        color: var(--text-tertiary);
+        gap: 12px;
+      }
+
+      .loading-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--border-color);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ========== 错误状态 ========== */
+      .error-section {
+        padding: 20px;
+        background: #fff2f0;
+        border: 1px solid #ffccc7;
+        border-radius: 8px;
+        color: #cf1322;
+        margin: 16px 0;
+      }
+
+      .error-section .error-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* ========== 响应式布局 ========== */
+      @media (max-width: 600px) {
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .footer-left {
+          flex-direction: column;
+        }
+
+        .footer-features {
+          justify-content: center;
+        }
+      }
+
+      /* ========== 深色模式 ========== */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --primary-light: #3d2a1f;
+          --primary-border: #5a3d2a;
+          --text-primary: #e5e5e5;
+          --text-secondary: #a0a0a0;
+          --text-tertiary: #666666;
+          --bg-primary: #1a1a1a;
+          --bg-secondary: #2a2a2a;
+          --border-color: #404040;
+          --link-color: #4da3ff;
+        }
+
+        .logo-text svg path:first-child {
+          fill: #e5e5e5;
+        }
+
+        .answer-content table tr:nth-child(even) {
+          background: #333333;
+        }
+
+        .footer-qr {
+          background: #ffffff;
+        }
+
+        .footer-feature {
+          background: #333333;
+          border-color: #404040;
+        }
+
+        .reference-title a {
+          color: var(--text-primary);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 顶部 Logo 区域 -->
+    <header class="header">
+      <div class="logo-wrapper">
+        <div class="logo-icon" id="logo-icon">
+          <!-- Logo Icon SVG will be inserted here -->
+        </div>
+        <div class="logo-text" id="logo-text">
+          <!-- Logo Text SVG will be inserted here -->
+        </div>
+      </div>
+      <button class="header-action" id="goto-website-btn" type="button">
+        去百小应官网
+        <svg viewBox="0 0 24 24">
+          <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="container">
+      <div class="main-content">
+        <!-- 加载状态 -->
+        <div id="loading" class="loading">
+          <div class="loading-spinner"></div>
+          <span>正在加载结果...</span>
+        </div>
+
+        <!-- 内容区域 -->
+        <div id="content" style="display: none">
+          <!-- COT 思考过程区域 -->
+          <div id="thinking-section" class="thinking-section" style="display: none">
+            <div class="thinking-header" id="thinking-header">
+              <div class="thinking-toggle" id="thinking-toggle">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
+              </div>
+              <div class="thinking-status">
+                <span class="thinking-status-icon">✓</span>
+                <span id="thinking-status-text">完成思考</span>
+              </div>
+            </div>
+            <div class="thinking-content" id="thinking-content">
+              <div class="thinking-steps" id="thinking-steps">
+                <!-- 思考步骤将在 JS 中动态生成 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 回答正文区域 -->
+          <div id="answer-section" class="answer-section" style="display: none">
+            <div class="answer-content" id="answer-content">
+              <!-- Markdown 渲染内容将在 JS 中动态生成 -->
+            </div>
+          </div>
+
+          <!-- 全部引用区域 -->
+          <div id="references-section" class="references-section" style="display: none">
+            <div class="references-header" id="references-header">
+              <div class="references-toggle" id="references-toggle">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
+              </div>
+              <span class="references-title" id="references-title">全部引用</span>
+            </div>
+            <div class="references-content" id="references-content">
+              <div class="references-list" id="references-list">
+                <!-- 引用列表将在 JS 中动态生成 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部区域 -->
+    <footer class="footer" id="footer" style="display: none">
+      <div class="footer-content">
+        <div class="footer-left">
+          <div class="footer-qr" id="footer-qr">
+            <!-- 二维码将在 JS 中生成 -->
+          </div>
+          <div class="footer-info">
+            <div class="footer-title">下载百小应 APP</div>
+            <div class="footer-desc">随时随地获取专业医学建议</div>
+            <div class="footer-features">
+              <span class="footer-feature">7×24小时在线</span>
+              <span class="footer-feature">专业医学知识库</span>
+              <span class="footer-feature">隐私安全保障</span>
+            </div>
+          </div>
+        </div>
+        <button class="footer-btn" id="download-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          立即下载
+        </button>
+      </div>
+    </footer>
+
+    <script type="module" src="./chat-result.ts"></script>
+  </body>
+</html>
