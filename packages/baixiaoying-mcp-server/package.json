@@ -1,6 +1,6 @@
 {
   "name": "@baichuan/baixiaoying-mcp-server",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Baixiaoying MCP Server - 百小应医学大模型 MCP 服务",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
     "dev": "concurrently \"cross-env NODE_ENV=development INPUT=src/ui/chat-result.html vite build --watch\" \"tsc --watch\"",
     "start": "node dist/index.js",
     "start:http": "node dist/index.js --http",
-    "clean": "rm -rf dist *.tsbuildinfo",
+    "clean": "rimraf dist *.tsbuildinfo",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
@@ -36,15 +36,16 @@
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.0.0",
     "@modelcontextprotocol/sdk": "^1.25.3",
-    "@types/marked": "^6.0.0",
     "marked": "^17.0.1",
     "qrcode": "^1.5.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/marked": "^6.0.0",
     "@types/node": "^22.10.5",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1",
     "vite": "^5.4.11",
     "vite-plugin-singlefile": "^2.0.3"
   },

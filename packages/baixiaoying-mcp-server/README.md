@@ -1,13 +1,60 @@
 # @baichuan/baixiaoying-mcp-server
 
-百小应医学大模型 MCP Server，提供 Baichuan-M3-Plus 和 Baichuan-M2-Plus 模型的对话能力。
+百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/)。
+
+![Baichuan-M3-Plus](./src/ui/assets/m3-plus-banner.png)
+
+## 为什么选择百小应 MCP Server？
+
+### 🏆 SOTA 医学大模型
+
+Baichuan-M3-Plus 是百川智能推出的**最低幻觉循证增强医疗大模型**，在权威医学评测中表现卓越：
+
+| 指标                 | 表现                                                                    |
+| -------------------- | ----------------------------------------------------------------------- |
+| **幻觉率**           | 基准测试仅 **2.6%**，大幅领先行业                                       |
+| **HealthBench**      | 超越 OpenAI GPT-5.2，达到 SOTA                                          |
+| **HealthBench-Hard** | 得分 44.4，超越 GPT-5.2                                                 |
+| **SCAN-bench**       | 唯一在 Clinical Inquiry、Laboratory Testing、Diagnosis 三项同时排名第一 |
+| **成本**             | 相比上一代模型**降低 70%**                                              |
+
+### 🧬 核心技术优势
+
+- **六源循证系统** - 首创证据锚定技术，回答严谨可追溯，有效抑制幻觉
+- **临床问诊思维** - 模型底层具备临床医生的问诊思维与循证思维，支持 SCAN-Driven Clinical-Grade Systematic History Taking
+- **高保真临床问诊** - High-Fidelity Clinical Inquiry，将问诊过程重构为临床级别、结构化、可审计的信息生成流水线
+
+### 🧩 MCP APPs 协议
+
+已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与百小应官方 APP 完全对齐：
+
+![百小应可视化回答示例](./src/ui/assets/baixiaoying-screenshot-1.png)
+![百小应引用与证据示例](./src/ui/assets/baixiaoying-screenshot-2.png)
 
 ## 功能特性
 
+- 🖥️ **可视化回答** - 输出可视化内容，效果与百小应官方 APP 对齐
 - 🩺 **医学问答对话** - 使用专业医学大模型回答健康相关问题
 - 📄 **文档问答** - 上传医学文档进行智能问答
 - 📚 **证据引用** - 回答附带专业文献引用
 - 🧠 **思考过程** - 展示模型的推理思考步骤
+
+## 🎁 海纳百川计划
+
+![海纳百川计划](./src/ui/assets/hainabaichuan-plan.png)
+
+百川正式推出「海纳百川」计划，**面向所有为医务工作者提供服务的机构，免费提供循证增强的 M3-Plus API**。
+
+### 参与条件
+
+| 项目         | 说明                                                                       |
+| ------------ | -------------------------------------------------------------------------- |
+| **适用对象** | 为医务工作者提供服务的机构（医生、药剂师、医技师、护士、健管师、医学生等） |
+| **适用场景** | 临床辅助决策、医学教育                                                     |
+| **用途限制** | 仅用于真实服务场景，不得用于数据生产                                       |
+| **使用要求** | 产品需明确展示 Powered by 百川，不得对模型输出进行影响准确性的修改         |
+
+👉 [立即申请](https://www.baichuan-ai.com/home)
 
 ## 支持的模型
 
@@ -16,13 +63,21 @@
 | Baichuan-M3-Plus | 最新医学大模型，推荐使用 |
 | Baichuan-M2-Plus | 医学大模型               |
 
-## 安装
+## 学术与资源
+
+- 🏠 **百川官网**：https://www.baichuan-ai.com/home
+- 📖 **学术报告**：https://www.baichuan-ai.com/blog/baichuan-M3
+- 💻 **M3 Github**：https://github.com/baichuan-inc/Baichuan-M3-235B
+- 🤗 **M3 Model**：https://huggingface.co/baichuan-inc/Baichuan-M3-235B
+- ⚡ **M3 GPTQ-4bit**：https://huggingface.co/baichuan-inc/Baichuan-M3-235B-GPTQ-INT4
+
+## 快速开始
+
+### 安装
 
 ```bash
 npm install @baichuan/baixiaoying-mcp-server
 ```
-
-## 配置
 
 ### 环境变量
 
