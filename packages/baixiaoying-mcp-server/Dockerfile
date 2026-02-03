@@ -1,5 +1,5 @@
 # 百小应 MCP Server Dockerfile
-# 支持 Streamable HTTP 模式的独立部署
+# 支持 SSE/Hybrid 模式的独立部署
 
 # ========== 构建阶段 ==========
 FROM node:20-alpine AS builder
@@ -42,9 +42,13 @@ ENV NODE_ENV=production
 # 暴露端口
 EXPOSE 8787
 
-# 健康检查
+# 健康检查 - SSE 端点
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8787/mcp || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8787/sse || exit 1
+
+# 默认使用 Hybrid 模式（同时支持 SSE 和 Streamable HTTP）
+# 可通过环境变量 MCP_MODE 切换: sse, http, hybrid
+ENV MCP_MODE=hybrid
 
 # 启动命令
-CMD ["node", "packages/baixiaoying-mcp-server/dist/index.js", "--http", "--host", "0.0.0.0", "--port", "8787"]
+CMD node packages/baixiaoying-mcp-server/dist/index.js --${MCP_MODE:-hybrid} --host 0.0.0.0 --port 8787
