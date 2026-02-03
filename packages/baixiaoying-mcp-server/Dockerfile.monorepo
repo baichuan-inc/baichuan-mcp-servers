@@ -1,0 +1,58 @@
+# 百小应 MCP Server Dockerfile - Monorepo 版本
+# 在 monorepo 根目录执行 docker build
+#
+# 使用方式：
+#   cd baichuan-mcp-servers  # 项目根目录
+#   docker build -f packages/baixiaoying-mcp-server/Dockerfile.monorepo -t baixiaoying-mcp-server .
+
+# ========== 构建阶段 ==========
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 复制 workspace 配置文件
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY tsconfig.base.json ./
+
+# 复制 baixiaoying-mcp-server 包
+COPY packages/baixiaoying-mcp-server ./packages/baixiaoying-mcp-server
+
+# 安装依赖并构建
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @baichuan-ai/baixiaoying-mcp-server build
+
+# ========== 运行阶段 ==========
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# 安装 pnpm（用于运行时依赖）
+RUN npm install -g pnpm
+
+# 复制构建产物和依赖
+COPY --from=builder /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml ./
+COPY --from=builder /app/packages/baixiaoying-mcp-server/package.json ./packages/baixiaoying-mcp-server/
+COPY --from=builder /app/packages/baixiaoying-mcp-server/dist ./packages/baixiaoying-mcp-server/dist
+
+# 只安装生产依赖
+RUN pnpm install --frozen-lockfile --prod
+
+# 设置环境变量
+ENV NODE_ENV=production
+
+# 暴露端口
+EXPOSE 8787
+
+# 健康检查 - SSE 端点
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8787/sse || exit 1
+
+# 默认使用 Hybrid 模式（同时支持 SSE 和 Streamable HTTP）
+# 可通过环境变量 MCP_MODE 切换: sse, http, hybrid
+ENV MCP_MODE=hybrid
+
+# 启动命令
+CMD ["sh", "-c", "node packages/baixiaoying-mcp-server/dist/index.js --${MCP_MODE:-hybrid} --host 0.0.0.0 --port 8787"]

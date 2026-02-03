@@ -21,7 +21,12 @@
     "start:hybrid": "node dist/index.js --hybrid",
     "clean": "rimraf dist *.tsbuildinfo",
     "lint": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "deploy:local": "./scripts/deploy.sh local",
+    "deploy:remote": "./scripts/deploy.sh remote",
+    "deploy:build": "./scripts/deploy.sh build",
+    "deploy:stop": "./scripts/deploy.sh stop",
+    "deploy:logs": "./scripts/deploy.sh logs"
   },
   "keywords": [
     "mcp",
