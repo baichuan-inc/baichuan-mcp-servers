@@ -1,15 +1,30 @@
 {
   "name": "@baichuan-ai/baixiaoying-mcp-server",
   "version": "0.1.0",
-  "description": "Baixiaoying MCP Server - 百小应医学大模型 MCP 服务",
+  "description": "Baixiaoying MCP Server - 百川医学大模型 MCP 服务，支持 MCP Apps，复刻百小应的视觉样式",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/index.d.ts",
+      "import": "./dist/transport/index.js"
+    }
+  },
   "bin": {
     "baixiaoying-mcp-server": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "npm run build:ui && tsc",
@@ -31,12 +46,29 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
+    "mcp-server",
+    "mcp-apps",
     "baixiaoying",
     "baichuan",
-    "medical-ai"
+    "medical-ai",
+    "ai-assistant",
+    "llm"
   ],
-  "author": "Baichuan",
+  "author": {
+    "name": "Baichuan AI",
+    "email": "andy@baichuan-inc.com",
+    "url": "https://www.baichuan-ai.com"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baichuan-inc/baichuan-mcp-servers.git",
+    "directory": "packages/baixiaoying-mcp-server"
+  },
+  "bugs": {
+    "url": "https://github.com/baichuan-inc/baichuan-mcp-servers/issues"
+  },
+  "homepage": "https://github.com/baichuan-inc/baichuan-mcp-servers/tree/main/packages/baixiaoying-mcp-server#readme",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -48,7 +80,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/marked": "^6.0.0",
     "@types/node": "^22.10.5",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
@@ -57,6 +88,7 @@
     "vite-plugin-singlefile": "^2.0.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
