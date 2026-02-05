@@ -20,7 +20,7 @@ import { marked, type Tokens } from "marked";
 import QRCode from "qrcode";
 
 // ========== 常量配置 ==========
-const WEBSITE_URL = "https://ying.ai/";
+const WEBSITE_URL = "https://ying.ai/?channel=mcp";
 const DOWNLOAD_URL =
   "https://xiaoying.baichuan-ai.com/r/2pOaNfyLlsKvBFQgmdoRu2";
 
