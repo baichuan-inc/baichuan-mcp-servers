@@ -8,7 +8,7 @@
 
 BaiXiaoYing Medical LLM MCP Server — Supports the **latest MCP protocol feature [MCP Apps](https://modelcontextprotocol.io/docs/extensions/apps)**, providing visual response content that fully matches the official Baichuan APP [BaiXiaoYing](https://ying.ai/).
 
-![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/m3-plus-banner.png)
+![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/m3-plus-banner.png)
 
 ## Why Choose BaiXiaoYing MCP Server?
 
@@ -34,8 +34,8 @@ Baichuan-M3-Plus is Baichuan AI's **lowest hallucination evidence-enhanced medic
 
 Supports the latest MCP protocol **MCP Apps**, outputting visual content that is fully aligned with the official BaiXiaoYing APP:
 
-![BaiXiaoYing Visual Response Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-1.png)
-![BaiXiaoYing Evidence and Citation Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-2.png)
+![BaiXiaoYing Visual Response Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/baixiaoying-screenshot-1.png)
+![BaiXiaoYing Evidence and Citation Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/baixiaoying-screenshot-2.png)
 
 ## Features
 
@@ -149,7 +149,7 @@ Please help me translate this clinical research abstract into standard medical E
 
 ## 🎁 Hainabaichuan Program
 
-![Hainabaichuan Program](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/hainabaichuan-plan.png)
+![Hainabaichuan Program](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/hainabaichuan-plan.png)
 
 Baichuan has officially launched the "Hainabaichuan" program, **providing free evidence-enhanced M3-Plus API to all institutions serving medical professionals**.
 

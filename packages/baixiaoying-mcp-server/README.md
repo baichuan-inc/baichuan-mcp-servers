@@ -6,9 +6,9 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/LICENSE.txt)
 [![MCP Apps](https://img.shields.io/badge/MCP-Apps%20Supported-brightgreen.svg)](https://modelcontextprotocol.io/docs/extensions/apps)
 
-百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/)。
+百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/?channel=github)。
 
-![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/m3-plus-banner.png)
+![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/m3-plus-banner.png)
 
 ## 为什么选择百小应 MCP Server？
 
@@ -34,8 +34,8 @@ Baichuan-M3-Plus 是百川智能推出的**最低幻觉循证增强医疗大模�
 
 已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与百小应官方 APP 完全对齐：
 
-![百小应可视化回答示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-1.png)
-![百小应引用与证据示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-2.png)
+![百小应可视化回答示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/baixiaoying-screenshot-1.png)
+![百小应引用与证据示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/baixiaoying-screenshot-2.png)
 
 ## 功能特性
 
@@ -149,7 +149,7 @@ CAR-T 细胞疗法在实体瘤治疗中的最新研究突破有哪些？
 
 ## 🎁 海纳百川计划
 
-![海纳百川计划](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/hainabaichuan-plan.png)
+![海纳百川计划](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/src/ui/assets/hainabaichuan-plan.png)
 
 百川正式推出「海纳百川」计划，**面向所有为医务工作者提供服务的机构，免费提供循证增强的 M3-Plus API**。
 
