@@ -3,7 +3,7 @@
 # Baichuan MCP Servers
 
 <p align="center">
-  <strong>百川 MCP Servers 集合</strong> —— 基于 Model Context Protocol 的医疗 AI 服务器合集
+  <strong>百川 MCP Servers 集合</strong> —— 首批实现MCP Apps协议的的医疗 AI 服务器合集
 </p>
 
 <p align="center">
@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://www.baichuan-ai.com/home">官网</a> •
-  <a href="https://ying.ai/">百小应</a> •
+  <a href="https://ying.ai/?channel=github">百小应</a> •
   <a href="https://www.baichuan-ai.com/blog/baichuan-M3">学术报告</a> •
   <a href="https://github.com/baichuan-inc/Baichuan-M3-235B">M3 Github</a>
 </p>
@@ -41,7 +41,7 @@
 
 ### 🧩 MCP APPs 协议
 
-已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与 [百小应](https://ying.ai/) 官方 APP 完全对齐。
+已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与 [百小应](https://ying.ai/?channel=github) 官方 APP 完全对齐。
 
 ### 🎁 海纳百川计划
 

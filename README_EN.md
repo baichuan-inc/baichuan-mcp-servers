@@ -3,7 +3,7 @@
 # Baichuan MCP Servers
 
 <p align="center">
-  <strong>Baichuan MCP Servers Collection</strong> — Medical AI Servers based on Model Context Protocol
+  <strong>Baichuan MCP Servers Collection</strong> — Among the first medical AI server collections to implement the MCP Apps protocol
 </p>
 
 <p align="center">
