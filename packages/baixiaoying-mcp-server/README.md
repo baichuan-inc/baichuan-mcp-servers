@@ -1,7 +1,9 @@
+**中文** | [English](./README_EN.md)
+
 # @baichuan-ai/baixiaoying-mcp-server
 
 [![npm version](https://img.shields.io/npm/v/@baichuan-ai/baixiaoying-mcp-server.svg)](https://www.npmjs.com/package/@baichuan-ai/baixiaoying-mcp-server)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/LICENSE.txt)
 [![MCP Apps](https://img.shields.io/badge/MCP-Apps%20Supported-brightgreen.svg)](https://modelcontextprotocol.io/docs/extensions/apps)
 
 百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/)。
@@ -311,4 +313,4 @@ docker run -d \
 
 ## 许可证
 
-MIT
+[Apache License 2.0](./LICENSE.txt)

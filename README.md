@@ -1,3 +1,5 @@
+**中文** | [English](./README_EN.md)
+
 # Baichuan MCP Servers
 
 <p align="center">
@@ -5,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="./LICENSE.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
   <a href="https://modelcontextprotocol.io/docs/extensions/apps"><img src="https://img.shields.io/badge/MCP-Apps%20Supported-brightgreen.svg" alt="MCP Apps"></a>
 </p>
 
@@ -107,4 +109,4 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 
 ## 📄 License
 
-Apache-2.0
+[Apache-2.0](./LICENSE.txt)
