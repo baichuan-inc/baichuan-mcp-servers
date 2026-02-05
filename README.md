@@ -5,6 +5,11 @@
 </p>
 
 <p align="center">
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="https://modelcontextprotocol.io/docs/extensions/apps"><img src="https://img.shields.io/badge/MCP-Apps%20Supported-brightgreen.svg" alt="MCP Apps"></a>
+</p>
+
+<p align="center">
   <a href="https://www.baichuan-ai.com/home">官网</a> •
   <a href="https://ying.ai/">百小应</a> •
   <a href="https://www.baichuan-ai.com/blog/baichuan-M3">学术报告</a> •
@@ -100,79 +105,6 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 
 ---
 
-## 🚀 快速开始
-
-### 安装依赖
-
-```bash
-pnpm install
-```
-
-### 构建所有包
-
-```bash
-pnpm build
-```
-
-### 开发模式
-
-```bash
-# 启动所有包的开发模式
-pnpm dev
-
-# 单独开发某个包
-pnpm --filter @baichuan-ai/baixiaoying-mcp-server dev
-```
-
-### 运行 MCP Server
-
-```bash
-# 直接运行
-pnpm --filter @baichuan-ai/baixiaoying-mcp-server start
-
-# 或者构建后运行
-node packages/baixiaoying-mcp-server/dist/index.js
-```
-
----
-
-## 🛠️ 开发指南
-
-### 项目结构
-
-```
-baichuan-mcp-servers/
-├── packages/
-│   └── baixiaoying-mcp-server/     # 百小应 MCP Server
-├── package.json
-├── pnpm-workspace.yaml
-└── turbo.json
-```
-
-### 创建新的 MCP Server
-
-1. 在 `packages/` 目录下创建新目录
-2. 复制 `baixiaoying-mcp-server` 的结构作为模板
-3. 修改 `package.json` 中的包名和描述
-4. 实现你的 MCP Server 逻辑
-
-### 发布
-
-使用 changesets 管理版本和发布：
-
-```bash
-# 创建变更集
-pnpm changeset
-
-# 更新版本
-pnpm version-packages
-
-# 发布到 npm
-pnpm release
-```
-
----
-
 ## 📄 License
 
-MIT
+Apache-2.0
