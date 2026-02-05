@@ -8,7 +8,7 @@
 
 百小应医学大模型 MCP Server —— 已支持 **MCP 协议最新 Feature [MCP APPs](https://modelcontextprotocol.io/docs/extensions/apps)**，提供可视化的回答内容，体验完全对标百川官方 APP [百小应](https://ying.ai/)。
 
-![Baichuan-M3-Plus](./assets/m3-plus-banner.png)
+![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/m3-plus-banner.png)
 
 ## 为什么选择百小应 MCP Server？
 
@@ -34,8 +34,8 @@ Baichuan-M3-Plus 是百川智能推出的**最低幻觉循证增强医疗大模�
 
 已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与百小应官方 APP 完全对齐：
 
-![百小应可视化回答示例](./assets/baixiaoying-screenshot-1.png)
-![百小应引用与证据示例](./assets/baixiaoying-screenshot-2.png)
+![百小应可视化回答示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-1.png)
+![百小应引用与证据示例](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-2.png)
 
 ## 功能特性
 
@@ -47,9 +47,109 @@ Baichuan-M3-Plus 是百川智能推出的**最低幻觉循证增强医疗大模�
 - 🔌 **多协议支持** - 支持 stdio、SSE、Streamable HTTP、Hybrid 四种传输模式
 - 🚀 **服务器部署** - 支持独立部署为 HTTP 服务，可供多客户端同时访问
 
+## 📋 应用场景
+
+百小应背后拥有**权威的医疗专业知识库**，涵盖临床指南、药品说明书、医学文献等海量权威数据源，并保持动态更新。无论是日常问诊、临床决策还是医学研究，都能提供最可靠、可信的专业回答。
+
+### 🩺 智能问诊
+
+模拟临床医生的问诊思维，进行系统化的病史采集和症状分析。
+
+```
+我最近总是头晕，尤其是早上起床的时候，站起来会眼前发黑，持续大概几秒钟。请帮我分析一下可能的原因？
+```
+
+```
+孩子 3 岁，昨天开始发烧 38.5°C，伴有流鼻涕和轻微咳嗽，精神状态还可以，需要去医院吗？
+```
+
+### 💊 药物分析
+
+深度解析药物成分、作用机制、适应症及不良反应。
+
+```
+帮我分析一下阿司匹林和布洛芬的区别，它们的作用机制有什么不同？
+```
+
+```
+二甲双胍的作用机制是什么？为什么它是 2 型糖尿病的一线用药？
+```
+
+### 💉 用药指导
+
+提供专业的用药建议，包括剂量、用法、注意事项及药物相互作用。
+
+```
+我正在服用华法林，医生又给我开了阿莫西林，这两种药可以一起吃吗？需要注意什么？
+```
+
+```
+老年高血压患者长期服用氨氯地平，有哪些需要注意的事项？
+```
+
+### 📖 指南查询
+
+快速检索最新临床诊疗指南，获取权威推荐意见。
+
+```
+2024 年中国高血压防治指南对于高血压的诊断标准和分级是怎么规定的？
+```
+
+```
+最新的糖尿病肾病临床诊疗指南中，推荐的一线降糖药物是什么？
+```
+
+### 🏥 治疗方案
+
+基于循证医学，提供个性化的治疗方案建议。
+
+```
+初诊 2 型糖尿病患者，空腹血糖 9.2mmol/L，糖化血红蛋白 8.1%，BMI 26，无明显并发症，应该如何制定治疗方案？
+```
+
+```
+社区获得性肺炎的经验性抗菌治疗方案有哪些选择？
+```
+
+### 🔬 诊断分析
+
+辅助分析检验检查结果，提供鉴别诊断思路。
+
+```
+患者肝功能检查显示 ALT 156 U/L，AST 89 U/L，GGT 正常，请帮我分析可能的原因和需要进一步做的检查。
+```
+
+```
+甲状腺功能检查 TSH 偏低，FT4 偏高，这提示什么问题？需要做哪些进一步检查？
+```
+
+### 📚 医学研究动态
+
+追踪医学领域最新研究进展和突破性成果。
+
+```
+GLP-1 受体激动剂在心血管保护方面有哪些最新的研究进展？
+```
+
+```
+CAR-T 细胞疗法在实体瘤治疗中的最新研究突破有哪些？
+```
+
+### ✍️ 医学写作辅助
+
+辅助医学论文写作、病历书写、医学翻译等专业文档工作。
+
+```
+帮我写一份急性心肌梗死的入院病历模板，包括主诉、现病史、既往史等要素。
+```
+
+```
+请帮我将这段临床研究摘要翻译成规范的医学英语。
+```
+
 ## 🎁 海纳百川计划
 
-![海纳百川计划](./assets/hainabaichuan-plan.png)
+![海纳百川计划](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/hainabaichuan-plan.png)
 
 百川正式推出「海纳百川」计划，**面向所有为医务工作者提供服务的机构，免费提供循证增强的 M3-Plus API**。
 

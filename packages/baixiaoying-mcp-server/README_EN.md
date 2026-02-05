@@ -8,7 +8,7 @@
 
 BaiXiaoYing Medical LLM MCP Server — Supports the **latest MCP protocol feature [MCP Apps](https://modelcontextprotocol.io/docs/extensions/apps)**, providing visual response content that fully matches the official Baichuan APP [BaiXiaoYing](https://ying.ai/).
 
-![Baichuan-M3-Plus](./assets/m3-plus-banner.png)
+![Baichuan-M3-Plus](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/m3-plus-banner.png)
 
 ## Why Choose BaiXiaoYing MCP Server?
 
@@ -34,8 +34,8 @@ Baichuan-M3-Plus is Baichuan AI's **lowest hallucination evidence-enhanced medic
 
 Supports the latest MCP protocol **MCP Apps**, outputting visual content that is fully aligned with the official BaiXiaoYing APP:
 
-![BaiXiaoYing Visual Response Example](./assets/baixiaoying-screenshot-1.png)
-![BaiXiaoYing Evidence and Citation Example](./assets/baixiaoying-screenshot-2.png)
+![BaiXiaoYing Visual Response Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-1.png)
+![BaiXiaoYing Evidence and Citation Example](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/baixiaoying-screenshot-2.png)
 
 ## Features
 
@@ -47,9 +47,109 @@ Supports the latest MCP protocol **MCP Apps**, outputting visual content that is
 - 🔌 **Multi-Protocol Support** - Supports stdio, SSE, Streamable HTTP, and Hybrid transport modes
 - 🚀 **Server Deployment** - Can be deployed as an HTTP service for multi-client access
 
+## 📋 Application Scenarios
+
+BaiXiaoYing is powered by an **authoritative medical knowledge base** that encompasses clinical guidelines, drug information, medical literature, and other comprehensive authoritative data sources, with continuous dynamic updates. Whether for daily consultations, clinical decision-making, or medical research, it provides the most reliable and trustworthy professional answers.
+
+### 🩺 Intelligent Consultation
+
+Simulates clinical physicians' diagnostic thinking for systematic medical history collection and symptom analysis.
+
+```
+I've been feeling dizzy lately, especially when I wake up in the morning. When I stand up, my vision goes black for a few seconds. Can you help me analyze the possible causes?
+```
+
+```
+My 3-year-old child started having a fever of 38.5°C yesterday, with runny nose and slight cough. The child's spirits seem okay. Do we need to go to the hospital?
+```
+
+### 💊 Drug Analysis
+
+In-depth analysis of drug components, mechanisms of action, indications, and adverse reactions.
+
+```
+Can you explain the difference between aspirin and ibuprofen? How do their mechanisms of action differ?
+```
+
+```
+What is the mechanism of action of metformin? Why is it considered the first-line medication for type 2 diabetes?
+```
+
+### 💉 Medication Guidance
+
+Provides professional medication advice including dosage, administration, precautions, and drug interactions.
+
+```
+I'm currently taking warfarin, and my doctor also prescribed amoxicillin. Can I take these two medications together? What should I be aware of?
+```
+
+```
+What precautions should elderly hypertension patients taking long-term amlodipine be aware of?
+```
+
+### 📖 Guideline Queries
+
+Quickly retrieve the latest clinical practice guidelines and authoritative recommendations.
+
+```
+What are the diagnostic criteria and classification standards for hypertension according to the 2024 Chinese Hypertension Prevention and Treatment Guidelines?
+```
+
+```
+What are the recommended first-line hypoglycemic agents in the latest clinical practice guidelines for diabetic nephropathy?
+```
+
+### 🏥 Treatment Plans
+
+Provides personalized treatment plan recommendations based on evidence-based medicine.
+
+```
+A newly diagnosed type 2 diabetes patient with fasting blood glucose of 9.2mmol/L, HbA1c of 8.1%, BMI of 26, and no obvious complications. How should the treatment plan be formulated?
+```
+
+```
+What are the options for empirical antimicrobial therapy for community-acquired pneumonia?
+```
+
+### 🔬 Diagnostic Analysis
+
+Assists in analyzing laboratory and examination results, providing differential diagnosis approaches.
+
+```
+A patient's liver function test shows ALT 156 U/L, AST 89 U/L, with normal GGT. Please help analyze the possible causes and what further tests are needed.
+```
+
+```
+Thyroid function test shows low TSH and high FT4. What does this indicate? What further examinations are needed?
+```
+
+### 📚 Medical Research Updates
+
+Track the latest research progress and breakthrough achievements in the medical field.
+
+```
+What are the latest research developments on GLP-1 receptor agonists in cardiovascular protection?
+```
+
+```
+What are the latest research breakthroughs in CAR-T cell therapy for solid tumor treatment?
+```
+
+### ✍️ Medical Writing Assistance
+
+Assists with medical paper writing, medical record documentation, medical translation, and other professional documentation tasks.
+
+```
+Help me write a template for an acute myocardial infarction admission medical record, including chief complaint, history of present illness, past medical history, and other elements.
+```
+
+```
+Please help me translate this clinical research abstract into standard medical English.
+```
+
 ## 🎁 Hainabaichuan Program
 
-![Hainabaichuan Program](./assets/hainabaichuan-plan.png)
+![Hainabaichuan Program](https://raw.githubusercontent.com/baichuan-inc/baichuan-mcp-servers/main/packages/baixiaoying-mcp-server/assets/hainabaichuan-plan.png)
 
 Baichuan has officially launched the "Hainabaichuan" program, **providing free evidence-enhanced M3-Plus API to all institutions serving medical professionals**.
 
