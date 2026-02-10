@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://www.baichuan-ai.com/home">Website</a> •
-  <a href="https://ying.ai/">BaiXiaoYing</a> •
+  <a href="https://ying.ai/?channel=github">BaiXiaoYing</a> •
   <a href="https://www.baichuan-ai.com/blog/baichuan-M3">Academic Report</a> •
   <a href="https://github.com/baichuan-inc/Baichuan-M3-235B">M3 Github</a>
 </p>
@@ -41,7 +41,7 @@ Based on Baichuan AI's **Baichuan-M3-Plus** — the lowest hallucination evidenc
 
 ### 🧩 MCP Apps Protocol
 
-Supports the latest MCP protocol **MCP Apps**, outputting visual content that is fully aligned with the official [BaiXiaoYing](https://ying.ai/) APP.
+Supports the latest MCP protocol **MCP Apps**, outputting visual content that is fully aligned with the official [BaiXiaoYing](https://ying.ai/?channel=github) APP.
 
 ### 🎁 Hainabaichuan Program
 
@@ -98,7 +98,7 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 | Resource            | Link                                                           |
 | ------------------- | -------------------------------------------------------------- |
 | 🏠 Baichuan Website | https://www.baichuan-ai.com/home                               |
-| 📱 BaiXiaoYing APP  | https://ying.ai/                                               |
+| 📱 BaiXiaoYing APP  | https://ying.ai/?channel=github                                               |
 | 📖 Academic Report  | https://www.baichuan-ai.com/blog/baichuan-M3                   |
 | 💻 M3 Github        | https://github.com/baichuan-inc/Baichuan-M3-235B               |
 | 🤗 M3 Model         | https://huggingface.co/baichuan-inc/Baichuan-M3-235B           |

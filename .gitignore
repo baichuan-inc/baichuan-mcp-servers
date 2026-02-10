@@ -35,6 +35,10 @@ coverage/
 tmp/
 temp/
 
+# MCPB/DXT packaging
+.mcpb-staging/
+dist-mcpb/
+
 prp/
 
 

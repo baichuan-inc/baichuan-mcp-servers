@@ -11,6 +11,11 @@
  * - stdio: 标准输入输出（默认）
  * - sse: 旧版 SSE 协议（--sse 参数启用，兼容 Cursor）
  * - http: Streamable HTTP（--http 参数启用）
+ * - hybrid: 混合模式（--hybrid 参数启用，同时支持 HTTP 和 SSE）
+ *
+ * 鉴权:
+ * - 用户通过 Authorization: Bearer <key> 传入百川 API Key
+ * - BAICHUAN_API_KEY 环境变量作为后备
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -19,8 +24,8 @@ import {
   registerAppResource,
   RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
-import { BaixiaoyingClient } from "./api/index.js";
-import { registerChatTool, registerFileTools } from "./tools/index.js";
+import { BaixiaoyingClientFactory } from "./api/index.js";
+import { registerChatTool, registerFileTools, type ClientResolver } from "./tools/index.js";
 import { getUiResourceUri, loadUiHtml } from "./ui/resource.js";
 import {
   StreamableHttpTransport,
@@ -35,31 +40,23 @@ import {
 const SERVER_NAME = "baixiaoying-mcp-server";
 const SERVER_VERSION = "0.0.1";
 
+// ========== 全局 Client 工厂 ==========
+const timeoutMs = Number(process.env.BAICHUAN_TIMEOUT_MS || "120000");
+const clientFactory = new BaixiaoyingClientFactory(
+  undefined,
+  Number.isFinite(timeoutMs) ? timeoutMs : 25000
+);
+
 // ========== 创建 MCP Server ==========
-function createServer(): McpServer {
+function createServer(resolveClient: ClientResolver): McpServer {
   const server = new McpServer({
     name: SERVER_NAME,
     version: SERVER_VERSION,
   });
 
-  // 获取 API Key
-  const apiKey = process.env.BAICHUAN_API_KEY;
-  const timeoutMs = Number(process.env.BAICHUAN_TIMEOUT_MS || "120000");
-
-  // 创建客户端（如果有 API Key）
-  let client: BaixiaoyingClient | null = null;
-  if (apiKey) {
-    client = new BaixiaoyingClient(apiKey, undefined, Number.isFinite(timeoutMs) ? timeoutMs : 25000);
-  } else {
-    console.error(
-      "Warning: BAICHUAN_API_KEY environment variable is not set. " +
-      "Tools will return errors until the API key is configured."
-    );
-  }
-
   // 注册所有工具
-  registerChatTool(server, client);
-  registerFileTools(server, client);
+  registerChatTool(server, resolveClient);
+  registerFileTools(server, resolveClient);
 
   // 注册服务器信息资源
   server.registerResource(
@@ -87,7 +84,6 @@ function createServer(): McpServer {
                   fileUpload: true,
                   documentQA: true,
                 },
-                apiKeyConfigured: !!apiKey,
               },
               null,
               2
@@ -143,24 +139,28 @@ function printHelp(): void {
   --help, -h          显示帮助信息
 
 环境变量:
-  BAICHUAN_API_KEY         百川 API Key（必需）
+  BAICHUAN_API_KEY         百川 API Key（HTTP/SSE 模式下作为后备，stdio 模式下必需）
   BAICHUAN_TIMEOUT_MS      API 请求超时（毫秒，默认: 120000）
   MCP_ALLOWED_ORIGINS      允许的 Origin 白名单（逗号分隔）
   MCP_ALLOW_EMPTY_ORIGIN   允许无 Origin 的请求（true/false，默认: true）
   MCP_SESSION_TTL          Session 过期时间（毫秒，默认: 1800000）
+
+鉴权说明:
+  HTTP/SSE 模式下，用户通过 Authorization: Bearer <key> 传入百川 API Key，
+  服务端使用该 Key 进行后续 API 调用。如未传入，则回退到 BAICHUAN_API_KEY 环境变量。
 
 示例:
   # stdio 模式（默认）
   BAICHUAN_API_KEY=xxx baixiaoying-mcp-server
 
   # SSE 模式（兼容 Cursor）
-  BAICHUAN_API_KEY=xxx baixiaoying-mcp-server --sse --port 8787
+  baixiaoying-mcp-server --sse --port 8787
 
   # Streamable HTTP 模式
-  BAICHUAN_API_KEY=xxx baixiaoying-mcp-server --http --host 0.0.0.0 --port 8787
+  baixiaoying-mcp-server --http --host 0.0.0.0 --port 8787
 
   # 混合模式（推荐，同时支持 Streamable HTTP 和 SSE）
-  BAICHUAN_API_KEY=xxx baixiaoying-mcp-server --hybrid --port 8787
+  baixiaoying-mcp-server --hybrid --port 8787
 `);
 }
 
@@ -179,23 +179,32 @@ async function main() {
   const useHybrid = args.includes("--hybrid");
 
   if (useHybrid) {
-    // 混合模式 - 同时支持 Streamable HTTP 和 SSE
+    // ====== 混合模式 ======
     const options = parseHybridOptions(args);
     const hybridServer = new HybridServer(options);
 
-    // Streamable HTTP: 创建一个 MCP Server 实例
-    const streamableServer = createServer();
+    // Streamable HTTP 路径: 根据 sessionId 查找 API Key
+    const streamableResolver: ClientResolver = (extra) => {
+      if (extra.sessionId) {
+        const apiKey = hybridServer.sessionApiKeyMap.get(extra.sessionId);
+        return clientFactory.getClient(apiKey || process.env.BAICHUAN_API_KEY);
+      }
+      return clientFactory.getClient(process.env.BAICHUAN_API_KEY);
+    };
+
+    const streamableServer = createServer(streamableResolver);
     await streamableServer.connect(hybridServer.streamableTransport);
     console.error("[Main] MCP Server connected to Streamable HTTP transport");
 
-    // 旧版 SSE: 每个连接创建一个新的 MCP Server 实例
-    hybridServer.onSSETransportReady = async (transport) => {
-      const server = createServer();
+    // 旧版 SSE 路径: 每个连接绑定一个 client
+    hybridServer.onSSETransportReady = async (transport, apiKey) => {
+      const client = clientFactory.getClient(apiKey || process.env.BAICHUAN_API_KEY);
+      const sseResolver: ClientResolver = () => client;
+      const server = createServer(sseResolver);
       await server.connect(transport);
       console.error(`[Main] MCP Server connected to SSE transport: ${transport.sessionId}`);
     };
 
-    // 启动混合服务器
     await hybridServer.start();
 
     const host = options.host || "127.0.0.1";
@@ -208,7 +217,6 @@ async function main() {
     console.error(`  Legacy SSE: http://${host}:${port}/sse`);
     console.error(`  Cursor 配置: {"type": "sse", "url": "http://${host}:${port}/sse"}`);
 
-    // 优雅关闭
     const shutdown = async () => {
       console.error("\nShutting down...");
       await hybridServer.close();
@@ -218,18 +226,19 @@ async function main() {
     process.on("SIGINT", shutdown);
     process.on("SIGTERM", shutdown);
   } else if (useSSE) {
-    // SSE 模式 - 旧版 SSE 协议（兼容 Cursor）
+    // ====== SSE 模式 ======
     const options = parseLegacySSEOptions(args);
     const sseServer = new LegacySSEServer(options);
 
-    // 当有新的 SSE 连接时，创建一个新的 McpServer 实例
-    sseServer.onTransportReady = async (transport) => {
-      const server = createServer();
+    // 每个 SSE 连接绑定一个 client
+    sseServer.onTransportReady = async (transport, apiKey) => {
+      const client = clientFactory.getClient(apiKey || process.env.BAICHUAN_API_KEY);
+      const resolver: ClientResolver = () => client;
+      const server = createServer(resolver);
       await server.connect(transport);
       console.error(`[Main] MCP Server connected to SSE transport: ${transport.sessionId}`);
     };
 
-    // 启动 SSE 服务器
     await sseServer.start();
 
     const host = options.host || "127.0.0.1";
@@ -240,7 +249,6 @@ async function main() {
     );
     console.error(`  Cursor 配置: {"type": "sse", "url": "http://${host}:${port}/sse"}`);
 
-    // 优雅关闭
     const shutdown = async () => {
       console.error("\nShutting down...");
       await sseServer.close();
@@ -250,12 +258,20 @@ async function main() {
     process.on("SIGINT", shutdown);
     process.on("SIGTERM", shutdown);
   } else if (useHttp) {
-    // HTTP 模式 - Streamable HTTP
-    const server = createServer();
+    // ====== Streamable HTTP 模式 ======
     const options = parseOptions(args);
     const transport = new StreamableHttpTransport(options);
 
-    // 连接 MCP Server 和 Transport（connect 会自动调用 transport.start()）
+    // 根据 sessionId 查找 API Key
+    const resolver: ClientResolver = (extra) => {
+      if (extra.sessionId) {
+        const apiKey = transport.sessionApiKeyMap.get(extra.sessionId);
+        return clientFactory.getClient(apiKey || process.env.BAICHUAN_API_KEY);
+      }
+      return clientFactory.getClient(process.env.BAICHUAN_API_KEY);
+    };
+
+    const server = createServer(resolver);
     await server.connect(transport);
 
     const host = options.host || "127.0.0.1";
@@ -266,7 +282,6 @@ async function main() {
       `${SERVER_NAME} v${SERVER_VERSION} running on http://${host}:${port}${endpoint}`
     );
 
-    // 优雅关闭
     const shutdown = async () => {
       console.error("\nShutting down...");
       await transport.close();
@@ -276,8 +291,18 @@ async function main() {
     process.on("SIGINT", shutdown);
     process.on("SIGTERM", shutdown);
   } else {
-    // stdio 模式
-    const server = createServer();
+    // ====== stdio 模式 ======
+    const envApiKey = process.env.BAICHUAN_API_KEY;
+    if (!envApiKey) {
+      console.error(
+        "Warning: BAICHUAN_API_KEY environment variable is not set. " +
+        "Tools will return errors until the API key is configured."
+      );
+    }
+    const client = clientFactory.getClient(envApiKey);
+    const resolver: ClientResolver = () => client;
+
+    const server = createServer(resolver);
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error(`${SERVER_NAME} v${SERVER_VERSION} running on stdio`);

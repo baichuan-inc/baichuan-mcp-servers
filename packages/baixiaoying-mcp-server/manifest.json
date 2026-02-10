@@ -1,0 +1,86 @@
+{
+  "$schema": "https://unpkg.com/@anthropic-ai/mcpb@latest/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "dxt_version": "0.3",
+  "name": "baixiaoying-mcp-server",
+  "display_name": "Baixiaoying Medical AI MCP Server",
+  "version": "0.1.5",
+  "description": "Baichuan Medical AI MCP Server - provides medical Q&A, document upload, and evidence-based answers powered by Baichuan-M3-Plus model",
+  "long_description": "Baixiaoying MCP Server integrates Baichuan AI's medical large language models (Baichuan-M3-Plus / M2-Plus) into any MCP-compatible client.\n\nCapabilities:\n- Medical Q&A with evidence-based responses and source citations\n- Medical document upload and document-based Q&A\n- File management (upload, list, status check, delete)\n- MCP Apps visual UI support for rich chat results\n\nCompatible with Claude Desktop, Cursor, and all MCP protocol clients.",
+  "author": {
+    "name": "Baichuan AI",
+    "email": "andy@baichuan-inc.com",
+    "url": "https://www.baichuan-ai.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baichuan-inc/baichuan-mcp-servers"
+  },
+  "homepage": "https://github.com/baichuan-inc/baichuan-mcp-servers",
+  "documentation": "https://github.com/baichuan-inc/baichuan-mcp-servers/tree/main/packages/baixiaoying-mcp-server#readme",
+  "support": "https://github.com/baichuan-inc/baichuan-mcp-servers/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
+      "env": {
+        "BAICHUAN_API_KEY": "${user_config.api_key}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "baixiaoying_chat",
+      "description": "Medical Q&A chat using Baichuan medical AI models with evidence-based responses and source citations"
+    },
+    {
+      "name": "baixiaoying_upload_file",
+      "description": "Upload medical documents (PDF, DOC, TXT, HTML, MD, CSV, PNG, JPG) for document-based Q&A"
+    },
+    {
+      "name": "baixiaoying_list_files",
+      "description": "List all uploaded medical documents"
+    },
+    {
+      "name": "baixiaoying_get_file_status",
+      "description": "Check the parsing status of an uploaded document"
+    },
+    {
+      "name": "baixiaoying_delete_file",
+      "description": "Delete an uploaded medical document"
+    }
+  ],
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "Baichuan API Key",
+      "description": "Your Baichuan AI API Key for authenticating with the Baixiaoying service. Get one at https://platform.baichuan-ai.com",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "keywords": [
+    "medical-ai",
+    "baichuan",
+    "baixiaoying",
+    "mcp",
+    "healthcare",
+    "llm"
+  ],
+  "license": "MIT",
+  "privacy_policies": [],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

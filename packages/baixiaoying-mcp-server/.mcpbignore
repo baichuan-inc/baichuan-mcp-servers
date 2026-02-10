@@ -1,0 +1,57 @@
+# Source files (not needed in bundle - dist/ has compiled output)
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+tsconfig.*.json
+vite.config.ts
+
+# Development & testing
+.env*
+*.test.*
+test/
+coverage/
+*.tsbuildinfo
+
+# Build tool caches
+node_modules/.cache/
+node_modules/.bin/
+
+# Package manager lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Documentation (not needed in bundle)
+CHANGELOG*
+CONTRIBUTING*
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Deploy scripts
+scripts/
+
+# IDE & editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Source maps (optional, remove for smaller bundle)
+*.map
+
+# MCPB output artifacts
+*.mcpb
+*.dxt
+.mcpb-staging/
+
+# Git
+.git/
+.gitignore

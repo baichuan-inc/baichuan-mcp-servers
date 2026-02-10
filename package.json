@@ -10,7 +10,8 @@
     "test": "turbo run test",
     "inspector": "mcp-inspector",
     "clean": "turbo run clean && rimraf node_modules",
-    "release": "turbo run build && node ./scripts/publish.mjs --all"
+    "release": "turbo run build && node ./scripts/publish.mjs --all",
+    "pack:mcpb": "node ./scripts/pack-mcpb.mjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/inspector": "^0.19.0",

@@ -189,13 +189,15 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 
 ### 环境变量
 
-| 变量名                   | 必填 | 说明                                                                    |
-| ------------------------ | ---- | ----------------------------------------------------------------------- |
-| `BAICHUAN_API_KEY`       | 是   | 百川 API Key，从 [百川开放平台](https://platform.baichuan-ai.com/) 获取 |
-| `BAICHUAN_TIMEOUT_MS`    | 否   | API 请求超时（毫秒，默认: 120000）                                      |
-| `MCP_ALLOWED_ORIGINS`    | 否   | 允许的 Origin 白名单（逗号分隔，仅 HTTP/SSE 模式）                      |
-| `MCP_ALLOW_EMPTY_ORIGIN` | 否   | 允许无 Origin 的请求（true/false，默认: true）                          |
-| `MCP_SESSION_TTL`        | 否   | Session 过期时间（毫秒，默认: 1800000）                                 |
+| 变量名                   | 必填 | 说明                                                                                           |
+| ------------------------ | ---- | ---------------------------------------------------------------------------------------------- |
+| `BAICHUAN_API_KEY`       | 条件 | 百川 API Key，从 [百川开放平台](https://platform.baichuan-ai.com/) 获取。stdio 模式下必需；HTTP/SSE 模式下作为后备 |
+| `BAICHUAN_TIMEOUT_MS`    | 否   | API 请求超时（毫秒，默认: 120000）                                                             |
+| `MCP_ALLOWED_ORIGINS`    | 否   | 允许的 Origin 白名单（逗号分隔，仅 HTTP/SSE 模式）                                             |
+| `MCP_ALLOW_EMPTY_ORIGIN` | 否   | 允许无 Origin 的请求（true/false，默认: true）                                                 |
+| `MCP_SESSION_TTL`        | 否   | Session 过期时间（毫秒，默认: 1800000）                                                        |
+
+> **鉴权说明**: HTTP/SSE 模式下，用户通过 `Authorization: Bearer <your-baichuan-api-key>` 传入自己的百川 API Key，服务端将使用该 Key 进行后续 API 调用。如未传入，则回退到 `BAICHUAN_API_KEY` 环境变量。
 
 ### 传输协议
 
@@ -247,30 +249,40 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 1. 启动 SSE 服务器：
 
 ```bash
-BAICHUAN_API_KEY=your-api-key pnpm start:sse --port 8787
+pnpm start:sse --port 8787
 ```
 
-2. 在 Cursor 的 `~/.cursor/mcp.json` 中配置：
+2. 在 Cursor 的 `~/.cursor/mcp.json` 中配置，通过 `Authorization` header 传入你的百川 API Key：
 
 ```json
 {
   "mcpServers": {
     "baixiaoying": {
       "type": "sse",
-      "url": "http://127.0.0.1:8787/sse"
+      "url": "http://127.0.0.1:8787/sse",
+      "headers": {
+        "Authorization": "Bearer your-baichuan-api-key"
+      }
     }
   }
 }
 ```
+
+> 如果服务端已配置 `BAICHUAN_API_KEY` 环境变量作为后备，也可以不传 `Authorization` header。
 
 ### 服务器部署（Hybrid 模式）
 
 Hybrid 模式同时支持 Streamable HTTP 和 SSE 协议，推荐用于服务器部署：
 
 ```bash
-# 启动混合模式服务器
-BAICHUAN_API_KEY=your-api-key pnpm start:hybrid --host 0.0.0.0 --port 8787
+# 启动混合模式服务器（可选设置 BAICHUAN_API_KEY 作为后备）
+pnpm start:hybrid --host 0.0.0.0 --port 8787
+
+# 或设置后备 API Key
+BAICHUAN_API_KEY=your-fallback-key pnpm start:hybrid --host 0.0.0.0 --port 8787
 ```
+
+> 用户连接时通过 `Authorization: Bearer <key>` 传入自己的百川 API Key，服务端自动使用该 Key 进行 API 调用。
 
 启动后可用的端点：
 
@@ -404,10 +416,15 @@ pnpm start:hybrid
 # 构建镜像
 docker build -t baixiaoying-mcp-server .
 
-# 运行容器
+# 运行容器（可选设置后备 API Key）
 docker run -d \
   -p 8787:8787 \
-  -e BAICHUAN_API_KEY=your-api-key \
+  baixiaoying-mcp-server
+
+# 或设置后备 API Key
+docker run -d \
+  -p 8787:8787 \
+  -e BAICHUAN_API_KEY=your-fallback-key \
   baixiaoying-mcp-server
 ```
 

@@ -16,6 +16,7 @@ import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { SessionManager } from "./sse-session.js";
 import { SSEStream } from "./sse-stream.js";
+import { resolveApiKey } from "./auth.js";
 
 // ========== 配置接口 ==========
 
@@ -64,7 +65,7 @@ const SUPPORTED_PROTOCOL_VERSIONS = new Set([
 const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Accept, MCP-Protocol-Version, MCP-Session-Id",
+    "Content-Type, Accept, MCP-Protocol-Version, MCP-Session-Id, Authorization",
   "Access-Control-Expose-Headers": "MCP-Session-Id",
   "Access-Control-Max-Age": "86400",
 };
@@ -95,8 +96,14 @@ export class StreamableHttpTransport implements Transport {
   private server: Server | null = null;
   private sessionManager: SessionManager;
 
+  /** 按 session 存储的 API Key，供外部 ClientResolver 查找 */
+  private _sessionApiKeys: Map<string, string> = new Map();
+
   /** 是否已启动 */
   private _started: boolean = false;
+
+  /** 当前活跃的 session ID，供 MCP SDK 在 extra 中传递给工具 handler */
+  sessionId?: string;
 
   /** 消息回调 */
   onmessage?: (message: JSONRPCMessage) => void;
@@ -116,6 +123,11 @@ export class StreamableHttpTransport implements Transport {
   constructor(options: Partial<StreamableHttpOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
     this.sessionManager = new SessionManager(this.options.sessionTtl);
+  }
+
+  /** 获取 session 与 API Key 的映射表（只读） */
+  get sessionApiKeyMap(): ReadonlyMap<string, string> {
+    return this._sessionApiKeys;
   }
 
   /**
@@ -417,6 +429,7 @@ export class StreamableHttpTransport implements Transport {
           return;
         }
         this.activeSessionId = context.sessionId;
+        this.sessionId = context.sessionId;
       }
 
       res.writeHead(202);
@@ -444,7 +457,7 @@ export class StreamableHttpTransport implements Transport {
    * 处理 POST request 消息
    */
   private async handlePostRequest(
-    _req: IncomingMessage,
+    req: IncomingMessage,
     res: ServerResponse,
     context: RequestContext,
     message: JSONRPCMessage & { method: string; id: string | number }
@@ -468,16 +481,24 @@ export class StreamableHttpTransport implements Transport {
       }
     }
 
-    // initialize 请求 -> 创建新 session
+    // initialize 请求 -> 创建新 session 并存储 API Key
     let sessionId: string;
     if (isInitialize) {
       const session = this.sessionManager.createSession(context.protocolVersion);
       sessionId = session.sessionId;
+
+      // 提取并存储该 session 的 API Key
+      const apiKey = resolveApiKey(req);
+      if (apiKey) {
+        this._sessionApiKeys.set(sessionId, apiKey);
+      }
     } else {
       sessionId = context.sessionId!;
     }
 
     this.activeSessionId = sessionId;
+    // 设置 Transport 接口的 sessionId，供 MCP SDK 在 extra 中传递
+    this.sessionId = sessionId;
 
     // 根据 Accept 决定响应方式
     if (context.acceptsSSE) {
@@ -581,6 +602,7 @@ export class StreamableHttpTransport implements Transport {
     }
 
     this.activeSessionId = context.sessionId;
+    this.sessionId = context.sessionId;
 
     // 保持连接打开，流会在客户端断开时自动关闭
     console.error(
@@ -604,6 +626,7 @@ export class StreamableHttpTransport implements Transport {
 
     const deleted = this.sessionManager.deleteSession(context.sessionId);
     if (deleted) {
+      this._sessionApiKeys.delete(context.sessionId);
       if (this.activeSessionId === context.sessionId) {
         this.activeSessionId = null;
       }

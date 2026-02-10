@@ -9,8 +9,9 @@ import {
   registerAppTool,
   RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
-import { BaixiaoyingClient, Message, ContentItem, BaixiaoyingModel } from "../api/index.js";
+import { Message, ContentItem, BaixiaoyingModel } from "../api/index.js";
 import { getUiResourceUri } from "../ui/resource.js";
+import type { ClientResolver } from "./index.js";
 
 // 工具输入参数 Schema
 export const chatInputSchema = {
@@ -40,7 +41,7 @@ export type ChatInput = z.infer<z.ZodObject<typeof chatInputSchema>>;
 /**
  * 注册对话工具到 MCP Server
  */
-export function registerChatTool(server: McpServer, client: BaixiaoyingClient | null) {
+export function registerChatTool(server: McpServer, resolveClient: ClientResolver) {
   // 获取 UI 资源 URI
   const resourceUri = getUiResourceUri();
 
@@ -59,13 +60,14 @@ export function registerChatTool(server: McpServer, client: BaixiaoyingClient | 
         },
       },
     },
-    async (args) => {
+    async (args, extra) => {
+      const client = resolveClient({ sessionId: extra?.sessionId });
       if (!client) {
         return {
           content: [
             {
               type: "text" as const,
-              text: "错误：未配置 BAICHUAN_API_KEY 环境变量。请设置后重试。",
+              text: "错误：未提供 API Key。请在连接时通过 Authorization: Bearer <your-api-key> 传入百川 API Key，或在服务器配置 BAICHUAN_API_KEY 环境变量。",
             },
           ],
           isError: true,

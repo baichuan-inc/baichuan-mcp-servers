@@ -14,6 +14,7 @@ import {
   Server,
 } from "node:http";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { resolveApiKey } from "./auth.js";
 
 // ========== CORS Headers ==========
 
@@ -60,8 +61,8 @@ export class LegacySSEServer {
   private transports: Map<string, SSEServerTransport> = new Map();
   private _started: boolean = false;
 
-  /** 当有新的 transport 准备就绪时的回调 */
-  onTransportReady?: (transport: SSEServerTransport) => void;
+  /** 当有新的 transport 准备就绪时的回调，附带从请求中提取的 API Key */
+  onTransportReady?: (transport: SSEServerTransport, apiKey: string | null) => void;
 
   constructor(options: Partial<LegacySSEOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
@@ -192,12 +193,16 @@ export class LegacySSEServer {
 
   /**
    * 处理 SSE 连接请求
+   * 从请求中提取 API Key 并传递给回调
    */
   private async handleSSE(
-    _req: IncomingMessage,
+    req: IncomingMessage,
     res: ServerResponse
   ): Promise<void> {
-    console.error("[LegacySSE] New SSE connection");
+    // 从 Authorization header 提取 API Key
+    const apiKey = resolveApiKey(req);
+
+    console.error(`[LegacySSE] New SSE connection (apiKey: ${apiKey ? "provided" : "using env fallback or none"})`);
 
     // 创建 SSEServerTransport
     // 第一个参数是 POST message 的 endpoint
@@ -217,10 +222,9 @@ export class LegacySSEServer {
 
     console.error(`[LegacySSE] SSE connection established: ${transport.sessionId}`);
 
-    // 通知新的 transport 准备就绪
-    // 注意：不要手动调用 transport.start()，让 MCP Server 的 connect() 方法来调用
+    // 通知新的 transport 准备就绪，附带 API Key
     if (this.onTransportReady) {
-      this.onTransportReady(transport);
+      this.onTransportReady(transport, apiKey);
     }
   }
 

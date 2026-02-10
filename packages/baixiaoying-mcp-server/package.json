@@ -1,6 +1,6 @@
 {
   "name": "@baichuan-ai/baixiaoying-mcp-server",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Baixiaoying MCP Server - 百川医学大模型 MCP 服务，支持 MCP Apps，复刻百小应的视觉样式",
   "type": "module",
   "main": "./dist/index.js",
@@ -24,6 +24,8 @@
   },
   "files": [
     "dist",
+    "manifest.json",
+    ".mcpbignore",
     "README.md",
     "README_EN.md"
   ],
@@ -42,7 +44,8 @@
     "deploy:remote": "./scripts/deploy.sh remote",
     "deploy:build": "./scripts/deploy.sh build",
     "deploy:stop": "./scripts/deploy.sh stop",
-    "deploy:logs": "./scripts/deploy.sh logs"
+    "deploy:logs": "./scripts/deploy.sh logs",
+    "pack:mcpb": "cd ../.. && node ./scripts/pack-mcpb.mjs"
   },
   "keywords": [
     "mcp",

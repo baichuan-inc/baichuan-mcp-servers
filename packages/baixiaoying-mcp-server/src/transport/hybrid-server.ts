@@ -19,6 +19,7 @@ import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { SessionManager } from "./sse-session.js";
 import { SSEStream } from "./sse-stream.js";
+import { resolveApiKey } from "./auth.js";
 
 // ========== CORS Headers ==========
 
@@ -107,14 +108,17 @@ export class HybridServer {
   private pendingRequests: Map<string | number, PendingRequest> = new Map();
   private activeSessionId: string | null = null;
 
+  /** 按 session 存储的 API Key，供外部 ClientResolver 查找 */
+  private _sessionApiKeys: Map<string, string> = new Map();
+
   // 旧版 SSE 相关
   private sseTransports: Map<string, SSEServerTransport> = new Map();
 
   /** Streamable HTTP Transport 接口 */
   streamableTransport: StreamableHttpInterface;
 
-  /** 当有新的 SSE Transport 准备就绪时的回调 */
-  onSSETransportReady?: (transport: SSEServerTransport) => void;
+  /** 当有新的 SSE Transport 准备就绪时的回调，附带从请求中提取的 API Key */
+  onSSETransportReady?: (transport: SSEServerTransport, apiKey: string | null) => void;
 
   constructor(options: Partial<HybridServerOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
@@ -122,6 +126,7 @@ export class HybridServer {
 
     // 创建 Streamable HTTP Transport 接口
     this.streamableTransport = {
+      sessionId: undefined,
       onmessage: undefined,
       onerror: undefined,
       onclose: undefined,
@@ -129,6 +134,11 @@ export class HybridServer {
       close: async () => await this.close(),
       send: async (message: JSONRPCMessage) => await this.sendStreamableMessage(message),
     };
+  }
+
+  /** 获取 session 与 API Key 的映射表（只读） */
+  get sessionApiKeyMap(): ReadonlyMap<string, string> {
+    return this._sessionApiKeys;
   }
 
   /**
@@ -354,6 +364,7 @@ export class HybridServer {
       }
       if (context.sessionId) {
         this.activeSessionId = context.sessionId;
+        this.streamableTransport.sessionId = context.sessionId;
       }
       res.writeHead(202);
       res.end();
@@ -374,7 +385,7 @@ export class HybridServer {
   }
 
   private async handleStreamableRequest(
-    _req: IncomingMessage,
+    req: IncomingMessage,
     res: ServerResponse,
     context: RequestContext,
     message: JSONRPCMessage & { method: string; id: string | number }
@@ -398,11 +409,18 @@ export class HybridServer {
     if (isInitialize) {
       const session = this.sessionManager.createSession(context.protocolVersion);
       sessionId = session.sessionId;
+
+      // 提取并存储该 session 的 API Key
+      const apiKey = resolveApiKey(req);
+      if (apiKey) {
+        this._sessionApiKeys.set(sessionId, apiKey);
+      }
     } else {
       sessionId = context.sessionId!;
     }
 
     this.activeSessionId = sessionId;
+    this.streamableTransport.sessionId = sessionId;
 
     if (context.acceptsSSE) {
       res.setHeader("MCP-Session-Id", sessionId);
@@ -473,6 +491,7 @@ export class HybridServer {
     }
 
     this.activeSessionId = context.sessionId;
+    this.streamableTransport.sessionId = context.sessionId;
   }
 
   private handleStreamableDelete(
@@ -488,6 +507,7 @@ export class HybridServer {
 
     const deleted = this.sessionManager.deleteSession(context.sessionId);
     if (deleted) {
+      this._sessionApiKeys.delete(context.sessionId);
       if (this.activeSessionId === context.sessionId) {
         this.activeSessionId = null;
       }
@@ -529,10 +549,12 @@ export class HybridServer {
    * 处理 SSE 连接请求
    */
   private async handleSSEConnect(
-    _req: IncomingMessage,
+    req: IncomingMessage,
     res: ServerResponse
   ): Promise<void> {
-    console.error("[HybridServer] New SSE connection");
+    const apiKey = resolveApiKey(req);
+
+    console.error(`[HybridServer] New SSE connection (apiKey: ${apiKey ? "provided" : "using env fallback or none"})`);
 
     const transport = new SSEServerTransport(this.options.messageEndpoint, res);
     this.sseTransports.set(transport.sessionId, transport);
@@ -545,7 +567,7 @@ export class HybridServer {
     console.error(`[HybridServer] SSE connection established: ${transport.sessionId}`);
 
     if (this.onSSETransportReady) {
-      this.onSSETransportReady(transport);
+      this.onSSETransportReady(transport, apiKey);
     }
   }
 

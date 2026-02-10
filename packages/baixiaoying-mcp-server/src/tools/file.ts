@@ -7,7 +7,18 @@ import { z } from "zod";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { BaixiaoyingClient, FileParseStatusType } from "../api/index.js";
+import { FileParseStatusType } from "../api/index.js";
+import type { ClientResolver } from "./index.js";
+
+const NO_API_KEY_ERROR = {
+  content: [
+    {
+      type: "text" as const,
+      text: "错误：未提供 API Key。请在连接时通过 Authorization: Bearer <your-api-key> 传入百川 API Key，或在服务器配置 BAICHUAN_API_KEY 环境变量。",
+    },
+  ],
+  isError: true,
+};
 
 // ========== 文件上传工具 ==========
 export const uploadFileInputSchema = {
@@ -15,24 +26,17 @@ export const uploadFileInputSchema = {
   file_name: z.string().optional().describe("可选，自定义文件名。不提供则使用原文件名"),
 };
 
-export function registerUploadFileTool(server: McpServer, client: BaixiaoyingClient | null) {
+export function registerUploadFileTool(server: McpServer, resolveClient: ClientResolver) {
   server.registerTool(
     "baixiaoying_upload_file",
     {
       description: "上传医学文档用于后续的文档问答。支持 pdf、doc、docx、txt、html、md、csv、png、jpg 等格式。",
       inputSchema: uploadFileInputSchema,
     },
-    async (args) => {
+    async (args, extra) => {
+      const client = resolveClient({ sessionId: extra?.sessionId });
       if (!client) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "错误：未配置 BAICHUAN_API_KEY 环境变量。",
-            },
-          ],
-          isError: true,
-        };
+        return NO_API_KEY_ERROR;
       }
 
       const { file_path, file_name } = args as {
@@ -89,23 +93,16 @@ export function registerUploadFileTool(server: McpServer, client: BaixiaoyingCli
 }
 
 // ========== 文件列表工具 ==========
-export function registerListFilesTool(server: McpServer, client: BaixiaoyingClient | null) {
+export function registerListFilesTool(server: McpServer, resolveClient: ClientResolver) {
   server.registerTool(
     "baixiaoying_list_files",
     {
       description: "获取已上传的文件列表",
     },
-    async () => {
+    async (extra) => {
+      const client = resolveClient({ sessionId: extra?.sessionId });
       if (!client) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "错误：未配置 BAICHUAN_API_KEY 环境变量。",
-            },
-          ],
-          isError: true,
-        };
+        return NO_API_KEY_ERROR;
       }
 
       try {
@@ -163,24 +160,17 @@ export const getFileStatusInputSchema = {
   file_id: z.string().describe("要查询的文件 ID"),
 };
 
-export function registerGetFileStatusTool(server: McpServer, client: BaixiaoyingClient | null) {
+export function registerGetFileStatusTool(server: McpServer, resolveClient: ClientResolver) {
   server.registerTool(
     "baixiaoying_get_file_status",
     {
       description: "查询指定文件的解析状态。文件需要解析完成（状态为 online）后才能用于对话。",
       inputSchema: getFileStatusInputSchema,
     },
-    async (args) => {
+    async (args, extra) => {
+      const client = resolveClient({ sessionId: extra?.sessionId });
       if (!client) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "错误：未配置 BAICHUAN_API_KEY 环境变量。",
-            },
-          ],
-          isError: true,
-        };
+        return NO_API_KEY_ERROR;
       }
 
       const { file_id } = args as { file_id: string };
@@ -250,24 +240,17 @@ export const deleteFileInputSchema = {
   file_id: z.string().describe("要删除的文件 ID"),
 };
 
-export function registerDeleteFileTool(server: McpServer, client: BaixiaoyingClient | null) {
+export function registerDeleteFileTool(server: McpServer, resolveClient: ClientResolver) {
   server.registerTool(
     "baixiaoying_delete_file",
     {
       description: "删除指定的已上传文件。被知识库使用的文件需要先解除关联后才能删除。",
       inputSchema: deleteFileInputSchema,
     },
-    async (args) => {
+    async (args, extra) => {
+      const client = resolveClient({ sessionId: extra?.sessionId });
       if (!client) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "错误：未配置 BAICHUAN_API_KEY 环境变量。",
-            },
-          ],
-          isError: true,
-        };
+        return NO_API_KEY_ERROR;
       }
 
       const { file_id } = args as { file_id: string };
@@ -313,9 +296,9 @@ export function registerDeleteFileTool(server: McpServer, client: BaixiaoyingCli
 /**
  * 注册所有文件管理工具
  */
-export function registerFileTools(server: McpServer, client: BaixiaoyingClient | null) {
-  registerUploadFileTool(server, client);
-  registerListFilesTool(server, client);
-  registerGetFileStatusTool(server, client);
-  registerDeleteFileTool(server, client);
+export function registerFileTools(server: McpServer, resolveClient: ClientResolver) {
+  registerUploadFileTool(server, resolveClient);
+  registerListFilesTool(server, resolveClient);
+  registerGetFileStatusTool(server, resolveClient);
+  registerDeleteFileTool(server, resolveClient);
 }

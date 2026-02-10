@@ -189,13 +189,15 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 
 ### Environment Variables
 
-| Variable                 | Required | Description                                                                          |
-| ------------------------ | -------- | ------------------------------------------------------------------------------------ |
-| `BAICHUAN_API_KEY`       | Yes      | Baichuan API Key, obtain from [Baichuan Platform](https://platform.baichuan-ai.com/) |
-| `BAICHUAN_TIMEOUT_MS`    | No       | API request timeout (milliseconds, default: 120000)                                  |
-| `MCP_ALLOWED_ORIGINS`    | No       | Allowed Origin whitelist (comma-separated, HTTP/SSE modes only)                      |
-| `MCP_ALLOW_EMPTY_ORIGIN` | No       | Allow requests without Origin (true/false, default: true)                            |
-| `MCP_SESSION_TTL`        | No       | Session expiration (milliseconds, default: 1800000)                                  |
+| Variable                 | Required    | Description                                                                                                         |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| `BAICHUAN_API_KEY`       | Conditional | Baichuan API Key, obtain from [Baichuan Platform](https://platform.baichuan-ai.com/). Required for stdio; fallback for HTTP/SSE |
+| `BAICHUAN_TIMEOUT_MS`    | No          | API request timeout (milliseconds, default: 120000)                                                                 |
+| `MCP_ALLOWED_ORIGINS`    | No          | Allowed Origin whitelist (comma-separated, HTTP/SSE modes only)                                                     |
+| `MCP_ALLOW_EMPTY_ORIGIN` | No          | Allow requests without Origin (true/false, default: true)                                                           |
+| `MCP_SESSION_TTL`        | No          | Session expiration (milliseconds, default: 1800000)                                                                 |
+
+> **Authentication**: In HTTP/SSE modes, users pass their Baichuan API Key via the `Authorization: Bearer <your-baichuan-api-key>` header. The server uses this key for subsequent API calls. If not provided, it falls back to the `BAICHUAN_API_KEY` environment variable.
 
 ### Transport Protocols
 
@@ -247,30 +249,40 @@ Or use local installation:
 1. Start the SSE server:
 
 ```bash
-BAICHUAN_API_KEY=your-api-key pnpm start:sse --port 8787
+pnpm start:sse --port 8787
 ```
 
-2. Configure in Cursor's `~/.cursor/mcp.json`:
+2. Configure in Cursor's `~/.cursor/mcp.json`, passing your Baichuan API Key via the `Authorization` header:
 
 ```json
 {
   "mcpServers": {
     "baixiaoying": {
       "type": "sse",
-      "url": "http://127.0.0.1:8787/sse"
+      "url": "http://127.0.0.1:8787/sse",
+      "headers": {
+        "Authorization": "Bearer your-baichuan-api-key"
+      }
     }
   }
 }
 ```
+
+> If the server has `BAICHUAN_API_KEY` configured as a fallback, the `Authorization` header is optional.
 
 ### Server Deployment (Hybrid mode)
 
 Hybrid mode supports both Streamable HTTP and SSE protocols, recommended for server deployment:
 
 ```bash
-# Start hybrid mode server
-BAICHUAN_API_KEY=your-api-key pnpm start:hybrid --host 0.0.0.0 --port 8787
+# Start hybrid mode server (optionally set BAICHUAN_API_KEY as fallback)
+pnpm start:hybrid --host 0.0.0.0 --port 8787
+
+# Or set fallback API Key
+BAICHUAN_API_KEY=your-fallback-key pnpm start:hybrid --host 0.0.0.0 --port 8787
 ```
+
+> Users pass their Baichuan API Key via `Authorization: Bearer <key>` when connecting. The server automatically uses that key for API calls.
 
 Available endpoints after startup:
 
@@ -404,10 +416,15 @@ pnpm start:hybrid
 # Build image
 docker build -t baixiaoying-mcp-server .
 
-# Run container
+# Run container (optionally set fallback API Key)
 docker run -d \
   -p 8787:8787 \
-  -e BAICHUAN_API_KEY=your-api-key \
+  baixiaoying-mcp-server
+
+# Or set fallback API Key
+docker run -d \
+  -p 8787:8787 \
+  -e BAICHUAN_API_KEY=your-fallback-key \
   baixiaoying-mcp-server
 ```
 
