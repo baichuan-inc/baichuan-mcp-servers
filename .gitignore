@@ -44,3 +44,6 @@ prp/
 
 .claude/
 .cursor/
+
+# Security deployment docs (internal only)
+**/docs/security-deployment.md
