@@ -69,26 +69,6 @@
 - 📚 六源循证与证据引用
 - 🧠 展示模型推理思考过程
 
-**快速使用：**
-
-```bash
-npm install @baichuan-ai/baixiaoying-mcp-server
-```
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "command": "npx",
-      "args": ["-y", "@baichuan-ai/baixiaoying-mcp-server"],
-      "env": {
-        "BAICHUAN_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
 👉 [查看完整文档](./packages/baixiaoying-mcp-server/README.md)
 
 ---

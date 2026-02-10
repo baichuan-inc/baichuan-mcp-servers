@@ -187,14 +187,14 @@ CAR-T 细胞疗法在实体瘤治疗中的最新研究突破有哪些？
 
 ### 方式一：一键安装（推荐）
 
-从 GitHub Release 下载安装包，**双击即可安装**，无需任何命令行操作：
+我们在每个 GitHub Release 中提供 `.dxt` 和 `.mcpb` 两种安装包，下载后**双击即可安装**，无需任何命令行操作。
 
-| 客户端 | 安装包 | 下载链接 |
-| ------ | ------ | -------- |
-| **Cursor** | `.dxt` | [baixiaoying-mcp-server-0.2.1.dxt](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.dxt) |
-| **Claude Desktop** | `.mcpb` | [baixiaoying-mcp-server-0.2.1.mcpb](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.mcpb) |
+| 格式    | 说明                                                                                                                                                          | 支持的客户端                |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `.dxt`  | Desktop Extension，Cursor 专用的 MCP 扩展格式                                                                                                                 | Cursor                      |
+| `.mcpb` | [MCP Bundle](https://github.com/modelcontextprotocol/mcpb)，MCP 官方标准打包格式，类似 Chrome 扩展（.crx），将 MCP Server 及其依赖打包为可直接安装的 ZIP 归档 | Claude Desktop、Claude Code |
 
-> 查看所有版本：[GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases)
+前往 [GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases) 下载最新版本的安装包。
 
 ### 方式二：使用官方 SSE 服务（零部署）
 

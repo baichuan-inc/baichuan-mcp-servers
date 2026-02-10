@@ -69,26 +69,6 @@ BaiXiaoYing Medical LLM MCP Server, providing conversational capabilities of Bai
 - 📚 Six-source evidence with citations
 - 🧠 Display model reasoning process
 
-**Quick Start:**
-
-```bash
-npm install @baichuan-ai/baixiaoying-mcp-server
-```
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "command": "npx",
-      "args": ["-y", "@baichuan-ai/baixiaoying-mcp-server"],
-      "env": {
-        "BAICHUAN_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
 👉 [View Full Documentation](./packages/baixiaoying-mcp-server/README_EN.md)
 
 ---
@@ -98,7 +78,7 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 | Resource            | Link                                                           |
 | ------------------- | -------------------------------------------------------------- |
 | 🏠 Baichuan Website | https://www.baichuan-ai.com/home                               |
-| 📱 BaiXiaoYing APP  | https://ying.ai/?channel=github                                               |
+| 📱 BaiXiaoYing APP  | https://ying.ai/?channel=github                                |
 | 📖 Academic Report  | https://www.baichuan-ai.com/blog/baichuan-M3                   |
 | 💻 M3 Github        | https://github.com/baichuan-inc/Baichuan-M3-235B               |
 | 🤗 M3 Model         | https://huggingface.co/baichuan-inc/Baichuan-M3-235B           |

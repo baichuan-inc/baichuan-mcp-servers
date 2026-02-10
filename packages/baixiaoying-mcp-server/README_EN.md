@@ -187,14 +187,14 @@ Obtain an API Key from the [Baichuan Platform](https://platform.baichuan-ai.com/
 
 ### Option 1: One-Click Install (Recommended)
 
-Download the installer from GitHub Releases — **double-click to install**, no command line required:
+Each GitHub Release includes `.dxt` and `.mcpb` installers — **double-click to install**, no command line required.
 
-| Client | Package | Download |
-| ------ | ------- | -------- |
-| **Cursor** | `.dxt` | [baixiaoying-mcp-server-0.2.1.dxt](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.dxt) |
-| **Claude Desktop** | `.mcpb` | [baixiaoying-mcp-server-0.2.1.mcpb](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.mcpb) |
+| Format | Description | Supported Clients |
+| ------ | ----------- | ----------------- |
+| `.dxt` | Desktop Extension, Cursor's MCP extension format | Cursor |
+| `.mcpb` | [MCP Bundle](https://github.com/modelcontextprotocol/mcpb), the official MCP standard packaging format — similar to Chrome extensions (.crx), bundles an MCP Server with its dependencies into a directly installable ZIP archive | Claude Desktop, Claude Code |
 
-> View all versions: [GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases)
+Go to [GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases) to download the latest installers.
 
 ### Option 2: Official SSE Service (Zero Deployment)
 
