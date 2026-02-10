@@ -181,38 +181,46 @@ Baichuan has officially launched the "Hainabaichuan" program, **providing free e
 
 ## Quick Start
 
-### Installation
+### Prerequisites
 
-```bash
-npm install @baichuan-ai/baixiaoying-mcp-server
+Obtain an API Key from the [Baichuan Platform](https://platform.baichuan-ai.com/).
+
+### Option 1: One-Click Install (Recommended)
+
+Download the installer from GitHub Releases — **double-click to install**, no command line required:
+
+| Client | Package | Download |
+| ------ | ------- | -------- |
+| **Cursor** | `.dxt` | [baixiaoying-mcp-server-0.2.1.dxt](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.dxt) |
+| **Claude Desktop** | `.mcpb` | [baixiaoying-mcp-server-0.2.1.mcpb](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.mcpb) |
+
+> View all versions: [GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases)
+
+### Option 2: Official SSE Service (Zero Deployment)
+
+Baichuan provides an officially hosted SSE service — no local installation or deployment needed, just configure your client.
+
+**Cursor** — Add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "baixiaoying": {
+      "type": "sse",
+      "url": "https://baixiaoying-mcp-server.baichuan-ai.com/sse",
+      "headers": {
+        "Authorization": "Bearer your-baichuan-api-key"
+      }
+    }
+  }
+}
 ```
 
-### Environment Variables
+> Replace `your-baichuan-api-key` with your Baichuan API Key.
 
-| Variable                 | Required    | Description                                                                                                         |
-| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------- |
-| `BAICHUAN_API_KEY`       | Conditional | Baichuan API Key, obtain from [Baichuan Platform](https://platform.baichuan-ai.com/). Required for stdio; fallback for HTTP/SSE |
-| `BAICHUAN_TIMEOUT_MS`    | No          | API request timeout (milliseconds, default: 120000)                                                                 |
-| `MCP_ALLOWED_ORIGINS`    | No          | Allowed Origin whitelist (comma-separated, HTTP/SSE modes only)                                                     |
-| `MCP_ALLOW_EMPTY_ORIGIN` | No          | Allow requests without Origin (true/false, default: true)                                                           |
-| `MCP_SESSION_TTL`        | No          | Session expiration (milliseconds, default: 1800000)                                                                 |
+### Option 3: npx Quick Start
 
-> **Authentication**: In HTTP/SSE modes, users pass their Baichuan API Key via the `Authorization: Bearer <your-baichuan-api-key>` header. The server uses this key for subsequent API calls. If not provided, it falls back to the `BAICHUAN_API_KEY` environment variable.
-
-### Transport Protocols
-
-BaiXiaoYing MCP Server supports three transport protocols for different scenarios:
-
-| Mode                | Flag       | Endpoints           | Use Case                                          |
-| ------------------- | ---------- | ------------------- | ------------------------------------------------- |
-| **stdio**           | (default)  | -                   | Claude Desktop, local MCP clients                 |
-| **SSE**             | `--sse`    | `/sse` + `/message` | Cursor, legacy SSE clients                        |
-| **Streamable HTTP** | `--http`   | `/mcp`              | Modern MCP clients                                |
-| **Hybrid**          | `--hybrid` | `/mcp` + `/sse`     | Multi-client support (recommended for deployment) |
-
-### Claude Desktop Configuration (stdio mode)
-
-Add to `claude_desktop_config.json`:
+For Claude Desktop and other stdio-mode clients, add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -228,84 +236,7 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-Or use local installation:
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "command": "node",
-      "args": ["/path/to/baixiaoying-mcp-server/dist/index.js"],
-      "env": {
-        "BAICHUAN_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
-### Cursor Configuration (SSE mode)
-
-1. Start the SSE server:
-
-```bash
-pnpm start:sse --port 8787
-```
-
-2. Configure in Cursor's `~/.cursor/mcp.json`, passing your Baichuan API Key via the `Authorization` header:
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "type": "sse",
-      "url": "http://127.0.0.1:8787/sse",
-      "headers": {
-        "Authorization": "Bearer your-baichuan-api-key"
-      }
-    }
-  }
-}
-```
-
-> If the server has `BAICHUAN_API_KEY` configured as a fallback, the `Authorization` header is optional.
-
-### Server Deployment (Hybrid mode)
-
-Hybrid mode supports both Streamable HTTP and SSE protocols, recommended for server deployment:
-
-```bash
-# Start hybrid mode server (optionally set BAICHUAN_API_KEY as fallback)
-pnpm start:hybrid --host 0.0.0.0 --port 8787
-
-# Or set fallback API Key
-BAICHUAN_API_KEY=your-fallback-key pnpm start:hybrid --host 0.0.0.0 --port 8787
-```
-
-> Users pass their Baichuan API Key via `Authorization: Bearer <key>` when connecting. The server automatically uses that key for API calls.
-
-Available endpoints after startup:
-
-| Endpoint   | Protocol        | Purpose                   |
-| ---------- | --------------- | ------------------------- |
-| `/mcp`     | Streamable HTTP | Modern MCP clients        |
-| `/sse`     | Legacy SSE      | Cursor and legacy clients |
-| `/message` | Legacy SSE POST | SSE message endpoint      |
-
-### Command Line Options
-
-```bash
-baixiaoying-mcp-server [options]
-
-Options:
-  --sse               Enable SSE mode (compatible with Cursor)
-  --http              Enable Streamable HTTP mode
-  --hybrid            Enable Hybrid mode (supports both HTTP and SSE)
-  --host <address>    Listen address (default: 127.0.0.1)
-  --port <port>       Listen port (default: 8787)
-  --endpoint <path>   MCP endpoint path (default: /mcp)
-  --help, -h          Show help information
-```
+> For more installation options (npm install, server deployment, Docker, environment variables, etc.), see the [Development Guide](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/packages/baixiaoying-mcp-server/docs/development_en.md).
 
 ## Available Tools
 

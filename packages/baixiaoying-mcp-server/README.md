@@ -181,38 +181,46 @@ CAR-T 细胞疗法在实体瘤治疗中的最新研究突破有哪些？
 
 ## 快速开始
 
-### 安装
+### 前置条件
 
-```bash
-npm install @baichuan-ai/baixiaoying-mcp-server
+从 [百川开放平台](https://platform.baichuan-ai.com/) 获取 API Key。
+
+### 方式一：一键安装（推荐）
+
+从 GitHub Release 下载安装包，**双击即可安装**，无需任何命令行操作：
+
+| 客户端 | 安装包 | 下载链接 |
+| ------ | ------ | -------- |
+| **Cursor** | `.dxt` | [baixiaoying-mcp-server-0.2.1.dxt](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.dxt) |
+| **Claude Desktop** | `.mcpb` | [baixiaoying-mcp-server-0.2.1.mcpb](https://github.com/baichuan-inc/baichuan-mcp-servers/releases/latest/download/baixiaoying-mcp-server-0.2.1.mcpb) |
+
+> 查看所有版本：[GitHub Releases](https://github.com/baichuan-inc/baichuan-mcp-servers/releases)
+
+### 方式二：使用官方 SSE 服务（零部署）
+
+百川提供官方托管的 SSE 服务，无需本地安装和部署，直接在客户端中配置即可使用。
+
+**Cursor 配置** — 在 `~/.cursor/mcp.json` 中添加：
+
+```json
+{
+  "mcpServers": {
+    "baixiaoying": {
+      "type": "sse",
+      "url": "https://baixiaoying-mcp-server.baichuan-ai.com/sse",
+      "headers": {
+        "Authorization": "Bearer your-baichuan-api-key"
+      }
+    }
+  }
+}
 ```
 
-### 环境变量
+> 将 `your-baichuan-api-key` 替换为你的百川 API Key。
 
-| 变量名                   | 必填 | 说明                                                                                           |
-| ------------------------ | ---- | ---------------------------------------------------------------------------------------------- |
-| `BAICHUAN_API_KEY`       | 条件 | 百川 API Key，从 [百川开放平台](https://platform.baichuan-ai.com/) 获取。stdio 模式下必需；HTTP/SSE 模式下作为后备 |
-| `BAICHUAN_TIMEOUT_MS`    | 否   | API 请求超时（毫秒，默认: 120000）                                                             |
-| `MCP_ALLOWED_ORIGINS`    | 否   | 允许的 Origin 白名单（逗号分隔，仅 HTTP/SSE 模式）                                             |
-| `MCP_ALLOW_EMPTY_ORIGIN` | 否   | 允许无 Origin 的请求（true/false，默认: true）                                                 |
-| `MCP_SESSION_TTL`        | 否   | Session 过期时间（毫秒，默认: 1800000）                                                        |
+### 方式三：npx 快速启动
 
-> **鉴权说明**: HTTP/SSE 模式下，用户通过 `Authorization: Bearer <your-baichuan-api-key>` 传入自己的百川 API Key，服务端将使用该 Key 进行后续 API 调用。如未传入，则回退到 `BAICHUAN_API_KEY` 环境变量。
-
-### 传输协议
-
-百小应 MCP Server 支持三种传输协议，适用于不同场景：
-
-| 模式                | 参数       | 端点                | 适用场景                           |
-| ------------------- | ---------- | ------------------- | ---------------------------------- |
-| **stdio**           | (默认)     | -                   | Claude Desktop、本地 MCP 客户端    |
-| **SSE**             | `--sse`    | `/sse` + `/message` | Cursor、旧版 SSE 客户端            |
-| **Streamable HTTP** | `--http`   | `/mcp`              | 新版 MCP 客户端                    |
-| **Hybrid**          | `--hybrid` | `/mcp` + `/sse`     | 同时支持多种客户端（推荐服务部署） |
-
-### Claude Desktop 配置（stdio 模式）
-
-在 `claude_desktop_config.json` 中添加：
+适用于 Claude Desktop 等 stdio 模式客户端，在配置文件 `claude_desktop_config.json` 中添加：
 
 ```json
 {
@@ -228,120 +236,23 @@ npm install @baichuan-ai/baixiaoying-mcp-server
 }
 ```
 
-或者使用本地安装：
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "command": "node",
-      "args": ["/path/to/baixiaoying-mcp-server/dist/index.js"],
-      "env": {
-        "BAICHUAN_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
-### Cursor 配置（SSE 模式）
-
-1. 启动 SSE 服务器：
-
-```bash
-pnpm start:sse --port 8787
-```
-
-2. 在 Cursor 的 `~/.cursor/mcp.json` 中配置，通过 `Authorization` header 传入你的百川 API Key：
-
-```json
-{
-  "mcpServers": {
-    "baixiaoying": {
-      "type": "sse",
-      "url": "http://127.0.0.1:8787/sse",
-      "headers": {
-        "Authorization": "Bearer your-baichuan-api-key"
-      }
-    }
-  }
-}
-```
-
-> 如果服务端已配置 `BAICHUAN_API_KEY` 环境变量作为后备，也可以不传 `Authorization` header。
-
-### 服务器部署（Hybrid 模式）
-
-Hybrid 模式同时支持 Streamable HTTP 和 SSE 协议，推荐用于服务器部署：
-
-```bash
-# 启动混合模式服务器（可选设置 BAICHUAN_API_KEY 作为后备）
-pnpm start:hybrid --host 0.0.0.0 --port 8787
-
-# 或设置后备 API Key
-BAICHUAN_API_KEY=your-fallback-key pnpm start:hybrid --host 0.0.0.0 --port 8787
-```
-
-> 用户连接时通过 `Authorization: Bearer <key>` 传入自己的百川 API Key，服务端自动使用该 Key 进行 API 调用。
-
-启动后可用的端点：
-
-| 端点       | 协议            | 用途                |
-| ---------- | --------------- | ------------------- |
-| `/mcp`     | Streamable HTTP | 新版 MCP 客户端     |
-| `/sse`     | Legacy SSE      | Cursor 等旧版客户端 |
-| `/message` | Legacy SSE POST | SSE 消息发送端点    |
-
-### 命令行参数
-
-```bash
-baixiaoying-mcp-server [选项]
-
-选项:
-  --sse               启用 SSE 模式（兼容 Cursor）
-  --http              启用 Streamable HTTP 模式
-  --hybrid            启用混合模式（同时支持 HTTP 和 SSE）
-  --host <地址>       监听地址（默认: 127.0.0.1）
-  --port <端口>       监听端口（默认: 8787）
-  --endpoint <路径>   MCP endpoint 路径（默认: /mcp）
-  --help, -h          显示帮助信息
-```
+> 更多安装方式（npm 安装、服务器部署、Docker、环境变量配置等）请参阅 [开发指南](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/packages/baixiaoying-mcp-server/docs/development.md)。
 
 ## 可用工具
 
 > 详细文档请参阅 [可用工具](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/packages/baixiaoying-mcp-server/docs/tools.md)
 
-| 工具 | 说明 |
-|------|------|
-| `baixiaoying_chat` | 使用百小应大模型进行医学问答对话 |
-| `baixiaoying_upload_file` | 上传医学文档用于文档问答 |
-| `baixiaoying_list_files` | 获取已上传的文件列表 |
-| `baixiaoying_get_file_status` | 查询文件解析状态 |
-| `baixiaoying_delete_file` | 删除已上传文件 |
-
-## 使用示例
-
-### 基础对话
-
-```
-问百小应：高血压患者日常需要注意什么？
-```
-
-### 文档问答
-
-```
-1. 先上传文档
-2. 查询文件状态，等待变为 online
-3. 使用 baixiaoying_chat 工具，传入 file_ids 参数进行问答
-```
+| 工具                          | 说明                             |
+| ----------------------------- | -------------------------------- |
+| `baixiaoying_chat`            | 使用百小应大模型进行医学问答对话 |
+| `baixiaoying_upload_file`     | 上传医学文档用于文档问答         |
+| `baixiaoying_list_files`      | 获取已上传的文件列表             |
+| `baixiaoying_get_file_status` | 查询文件解析状态                 |
+| `baixiaoying_delete_file`     | 删除已上传文件                   |
 
 ## 开发
 
 > 详细文档请参阅 [开发指南](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/packages/baixiaoying-mcp-server/docs/development.md)
-
-## 安全部署建议
-
-> 详细文档请参阅 [安全部署建议](https://github.com/baichuan-inc/baichuan-mcp-servers/blob/main/packages/baixiaoying-mcp-server/docs/security-deployment.md)（包含 Nginx 反向代理配置、速率限制、安全相关环境变量等）
 
 ## 许可证
 
