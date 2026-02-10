@@ -14,7 +14,7 @@ const NO_API_KEY_ERROR = {
   content: [
     {
       type: "text" as const,
-      text: "错误：未提供 API Key。请在连接时通过 Authorization: Bearer <your-api-key> 传入百川 API Key，或在服务器配置 BAICHUAN_API_KEY 环境变量。",
+      text: "错误：未提供 API Key。请在连接时通过 Authorization: Bearer <your-api-key> 传入百川 API Key，或联系管理员配置服务端密钥。",
     },
   ],
   isError: true,

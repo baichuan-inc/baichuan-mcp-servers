@@ -3,6 +3,7 @@
  * 管理 MCP 会话的生命周期和关联的 SSE 流
  */
 
+import { randomUUID } from "node:crypto";
 import { SSEStream, generateStreamId } from "./sse-stream.js";
 import type { ServerResponse } from "node:http";
 
@@ -15,6 +16,11 @@ const DEFAULT_SESSION_TTL_MS = 30 * 60 * 1000;
  * Session 清理检查间隔（1分钟）
  */
 const CLEANUP_INTERVAL_MS = 60 * 1000;
+
+/**
+ * 默认最大 Session 数量
+ */
+const DEFAULT_MAX_SESSIONS = 1000;
 
 /**
  * Session 数据结构
@@ -46,18 +52,29 @@ export class SessionManager {
   /** Session TTL（毫秒） */
   private sessionTtl: number;
 
+  /** 最大 Session 数量 */
+  private maxSessions: number;
+
   /** 清理定时器 */
   private cleanupTimer: NodeJS.Timeout | null = null;
 
-  constructor(sessionTtl: number = DEFAULT_SESSION_TTL_MS) {
+  constructor(sessionTtl: number = DEFAULT_SESSION_TTL_MS, maxSessions: number = DEFAULT_MAX_SESSIONS) {
     this.sessionTtl = sessionTtl;
+    this.maxSessions = maxSessions;
     this.startCleanup();
   }
 
   /**
    * 创建新 Session
+   * @returns Session 对象，如果达到上限则返回 null
    */
-  createSession(protocolVersion: string): Session {
+  createSession(protocolVersion: string): Session | null {
+    // 检查 Session 数量上限
+    if (this.sessions.size >= this.maxSessions) {
+      console.error(`[SessionManager] Session limit reached (${this.maxSessions}), rejecting new session`);
+      return null;
+    }
+
     const sessionId = this.generateSessionId();
     const session: Session = {
       sessionId,
@@ -67,7 +84,7 @@ export class SessionManager {
       protocolVersion,
     };
     this.sessions.set(sessionId, session);
-    console.error(`[SessionManager] Created session: ${sessionId}`);
+    console.error(`[SessionManager] Created session: ${sessionId} (active: ${this.sessions.size}/${this.maxSessions})`);
     return session;
   }
 
@@ -187,12 +204,10 @@ export class SessionManager {
   }
 
   /**
-   * 生成唯一的 Session ID
+   * 生成唯一的 Session ID（密码学安全）
    */
   private generateSessionId(): string {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substring(2, 12);
-    return `mcp-session-${timestamp}-${random}`;
+    return randomUUID();
   }
 
   /**

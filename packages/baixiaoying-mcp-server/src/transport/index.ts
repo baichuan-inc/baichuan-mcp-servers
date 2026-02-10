@@ -2,7 +2,7 @@
  * Transport 模块导出
  */
 
-export { extractBearerToken, resolveApiKey } from "./auth.js";
+export { extractBearerToken, resolveApiKey, validateOrigin, type OriginValidationOptions } from "./auth.js";
 export { SSEStream, generateStreamId } from "./sse-stream.js";
 export { SessionManager, type Session } from "./sse-session.js";
 export {

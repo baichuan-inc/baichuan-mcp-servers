@@ -1,5 +1,5 @@
 /**
- * API Key 提取工具
+ * 认证与安全工具
  *
  * 从 HTTP 请求的 Authorization: Bearer <token> 头中提取用户的百川 API Key。
  * 在 HTTP/SSE 传输模式下，用户通过 Bearer Token 传入自己的 API Key，
@@ -36,4 +36,48 @@ export function extractBearerToken(req: IncomingMessage): string | null {
  */
 export function resolveApiKey(req: IncomingMessage): string | null {
   return extractBearerToken(req) || process.env.BAICHUAN_API_KEY || null;
+}
+
+/**
+ * Origin 校验配置
+ */
+export interface OriginValidationOptions {
+  /** 允许的 Origin 列表，支持通配符（如 "http://localhost:*"），"*" 表示允许所有 */
+  allowedOrigins: string[];
+  /** 是否允许空 Origin（CLI/桌面客户端通常不携带 Origin） */
+  allowEmptyOrigin: boolean;
+}
+
+/**
+ * 校验请求的 Origin 是否在白名单中
+ *
+ * @param origin 请求的 Origin header 值，null 表示未携带
+ * @param options 校验配置
+ * @returns 是否允许该 Origin
+ */
+export function validateOrigin(origin: string | null, options: OriginValidationOptions): boolean {
+  // 空 Origin 处理（CLI、桌面客户端等不带 Origin）
+  if (!origin) {
+    return options.allowEmptyOrigin;
+  }
+
+  // 检查白名单
+  for (const allowed of options.allowedOrigins) {
+    if (allowed === "*") {
+      return true;
+    }
+    // 支持通配符匹配（如 http://localhost:*）
+    if (allowed.includes("*")) {
+      const pattern = allowed
+        .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+        .replace(/\*/g, ".*");
+      if (new RegExp(`^${pattern}$`).test(origin)) {
+        return true;
+      }
+    } else if (origin === allowed || origin.startsWith(allowed)) {
+      return true;
+    }
+  }
+
+  return false;
 }

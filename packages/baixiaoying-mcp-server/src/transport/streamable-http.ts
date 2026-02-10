@@ -16,7 +16,12 @@ import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { SessionManager } from "./sse-session.js";
 import { SSEStream } from "./sse-stream.js";
-import { resolveApiKey } from "./auth.js";
+import { resolveApiKey, validateOrigin as validateOriginFn } from "./auth.js";
+
+// ========== 安全限制 ==========
+
+/** 请求体大小上限（1MB） */
+const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
 
 // ========== 配置接口 ==========
 
@@ -302,33 +307,13 @@ export class StreamableHttpTransport implements Transport {
   }
 
   /**
-   * 校验 Origin
+   * 校验 Origin（委托给公共函数）
    */
   private validateOrigin(origin: string | null): boolean {
-    // 空 Origin 处理
-    if (!origin) {
-      return this.options.allowEmptyOrigin;
-    }
-
-    // 检查白名单
-    for (const allowed of this.options.allowedOrigins) {
-      if (allowed === "*") {
-        return true;
-      }
-      // 支持通配符匹配（如 http://localhost:*）
-      if (allowed.includes("*")) {
-        const pattern = allowed
-          .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
-          .replace(/\*/g, ".*");
-        if (new RegExp(`^${pattern}$`).test(origin)) {
-          return true;
-        }
-      } else if (origin === allowed || origin.startsWith(allowed)) {
-        return true;
-      }
-    }
-
-    return false;
+    return validateOriginFn(origin, {
+      allowedOrigins: this.options.allowedOrigins,
+      allowEmptyOrigin: this.options.allowEmptyOrigin,
+    });
   }
 
   /**
@@ -349,6 +334,10 @@ export class StreamableHttpTransport implements Transport {
     for (const [key, value] of Object.entries(CORS_HEADERS)) {
       res.setHeader(key, value);
     }
+    // 安全响应头
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Cache-Control", "no-store");
   }
 
   /**
@@ -399,8 +388,13 @@ export class StreamableHttpTransport implements Transport {
     try {
       body = await this.readRequestBody(req);
     } catch (err) {
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Failed to read request body" }));
+      if (err instanceof Error && err.message === "Request body too large") {
+        res.writeHead(413, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Payload Too Large" }));
+      } else {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Failed to read request body" }));
+      }
       return;
     }
 
@@ -485,6 +479,11 @@ export class StreamableHttpTransport implements Transport {
     let sessionId: string;
     if (isInitialize) {
       const session = this.sessionManager.createSession(context.protocolVersion);
+      if (!session) {
+        res.writeHead(503, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Service Unavailable: too many active sessions" }));
+        return;
+      }
       sessionId = session.sessionId;
 
       // 提取并存储该 session 的 API Key
@@ -639,12 +638,21 @@ export class StreamableHttpTransport implements Transport {
   }
 
   /**
-   * 读取请求体
+   * 读取请求体（带大小限制，防止内存耗尽攻击）
    */
-  private readRequestBody(req: IncomingMessage): Promise<string> {
+  private readRequestBody(req: IncomingMessage, maxBytes: number = MAX_REQUEST_BODY_BYTES): Promise<string> {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = [];
-      req.on("data", (chunk) => chunks.push(chunk));
+      let totalSize = 0;
+      req.on("data", (chunk: Buffer) => {
+        totalSize += chunk.length;
+        if (totalSize > maxBytes) {
+          req.destroy();
+          reject(new Error("Request body too large"));
+          return;
+        }
+        chunks.push(chunk);
+      });
       req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
       req.on("error", reject);
     });

@@ -189,6 +189,10 @@ export class LegacySSEServer {
     for (const [key, value] of Object.entries(CORS_HEADERS)) {
       res.setHeader(key, value);
     }
+    // 安全响应头
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Cache-Control", "no-store");
   }
 
   /**

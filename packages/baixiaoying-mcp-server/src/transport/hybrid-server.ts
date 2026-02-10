@@ -19,7 +19,12 @@ import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { SessionManager } from "./sse-session.js";
 import { SSEStream } from "./sse-stream.js";
-import { resolveApiKey } from "./auth.js";
+import { resolveApiKey, validateOrigin } from "./auth.js";
+
+// ========== 安全限制 ==========
+
+/** 请求体大小上限（1MB） */
+const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
 
 // ========== CORS Headers ==========
 
@@ -54,6 +59,10 @@ export interface HybridServerOptions {
   protocolVersion: string;
   /** 回退协议版本 */
   protocolFallback: string;
+  /** 最大 Streamable HTTP Session 数量 */
+  maxSessions: number;
+  /** 最大 SSE 连接数量 */
+  maxSSEConnections: number;
 }
 
 const DEFAULT_OPTIONS: HybridServerOptions = {
@@ -62,11 +71,13 @@ const DEFAULT_OPTIONS: HybridServerOptions = {
   mcpEndpoint: "/mcp",
   sseEndpoint: "/sse",
   messageEndpoint: "/message",
-  allowedOrigins: ["http://localhost"],
+  allowedOrigins: ["*"],
   allowEmptyOrigin: true,
   sessionTtl: 30 * 60 * 1000,
   protocolVersion: "2025-11-25",
   protocolFallback: "2025-03-26",
+  maxSessions: 1000,
+  maxSSEConnections: 500,
 };
 
 // ========== 支持的协议版本 ==========
@@ -122,7 +133,7 @@ export class HybridServer {
 
   constructor(options: Partial<HybridServerOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.sessionManager = new SessionManager(this.options.sessionTtl);
+    this.sessionManager = new SessionManager(this.options.sessionTtl, this.options.maxSessions);
 
     // 创建 Streamable HTTP Transport 接口
     this.streamableTransport = {
@@ -266,6 +277,17 @@ export class HybridServer {
     for (const [key, value] of Object.entries(CORS_HEADERS)) {
       res.setHeader(key, value);
     }
+    // 安全响应头
+    this.addSecurityHeaders(res);
+  }
+
+  /**
+   * 添加安全响应头
+   */
+  private addSecurityHeaders(res: ServerResponse): void {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Cache-Control", "no-store");
   }
 
   // ========== Streamable HTTP 处理 ==========
@@ -279,6 +301,16 @@ export class HybridServer {
     _url: URL
   ): Promise<void> {
     const context = this.parseRequestContext(req);
+
+    // Origin 校验
+    if (!validateOrigin(context.origin, {
+      allowedOrigins: this.options.allowedOrigins,
+      allowEmptyOrigin: this.options.allowEmptyOrigin,
+    })) {
+      res.writeHead(403, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Forbidden: Invalid origin" }));
+      return;
+    }
 
     // 协议版本校验
     if (!SUPPORTED_PROTOCOL_VERSIONS.has(context.protocolVersion)) {
@@ -342,7 +374,20 @@ export class HybridServer {
       return;
     }
 
-    const body = await this.readRequestBody(req);
+    let body: string;
+    try {
+      body = await this.readRequestBody(req);
+    } catch (err) {
+      if (err instanceof Error && err.message === "Request body too large") {
+        res.writeHead(413, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Payload Too Large" }));
+      } else {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Failed to read request body" }));
+      }
+      return;
+    }
+
     let message: JSONRPCMessage;
     try {
       message = JSON.parse(body);
@@ -408,6 +453,11 @@ export class HybridServer {
     let sessionId: string;
     if (isInitialize) {
       const session = this.sessionManager.createSession(context.protocolVersion);
+      if (!session) {
+        res.writeHead(503, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Service Unavailable: too many active sessions" }));
+        return;
+      }
       sessionId = session.sessionId;
 
       // 提取并存储该 session 的 API Key
@@ -552,6 +602,14 @@ export class HybridServer {
     req: IncomingMessage,
     res: ServerResponse
   ): Promise<void> {
+    // 检查 SSE 连接数上限
+    if (this.sseTransports.size >= this.options.maxSSEConnections) {
+      console.error(`[HybridServer] SSE connection limit reached (${this.options.maxSSEConnections}), rejecting`);
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Service Unavailable: too many active SSE connections" }));
+      return;
+    }
+
     const apiKey = resolveApiKey(req);
 
     console.error(`[HybridServer] New SSE connection (apiKey: ${apiKey ? "provided" : "using env fallback or none"})`);
@@ -603,10 +661,22 @@ export class HybridServer {
 
   // ========== 工具方法 ==========
 
-  private readRequestBody(req: IncomingMessage): Promise<string> {
+  /**
+   * 读取请求体（带大小限制，防止内存耗尽攻击）
+   */
+  private readRequestBody(req: IncomingMessage, maxBytes: number = MAX_REQUEST_BODY_BYTES): Promise<string> {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = [];
-      req.on("data", (chunk) => chunks.push(chunk));
+      let totalSize = 0;
+      req.on("data", (chunk: Buffer) => {
+        totalSize += chunk.length;
+        if (totalSize > maxBytes) {
+          req.destroy();
+          reject(new Error("Request body too large"));
+          return;
+        }
+        chunks.push(chunk);
+      });
       req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
       req.on("error", reject);
     });
@@ -673,6 +743,22 @@ export function parseHybridOptions(args: string[]): Partial<HybridServerOptions>
     const ttl = parseInt(envSessionTtl, 10);
     if (!isNaN(ttl)) {
       options.sessionTtl = ttl;
+    }
+  }
+
+  const envMaxSessions = process.env.MCP_MAX_SESSIONS;
+  if (envMaxSessions) {
+    const max = parseInt(envMaxSessions, 10);
+    if (!isNaN(max) && max > 0) {
+      options.maxSessions = max;
+    }
+  }
+
+  const envMaxSSE = process.env.MCP_MAX_SSE_CONNECTIONS;
+  if (envMaxSSE) {
+    const max = parseInt(envMaxSSE, 10);
+    if (!isNaN(max) && max > 0) {
+      options.maxSSEConnections = max;
     }
   }
 
