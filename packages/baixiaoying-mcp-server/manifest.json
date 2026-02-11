@@ -4,7 +4,7 @@
   "dxt_version": "0.3",
   "name": "baixiaoying-mcp-server",
   "display_name": "Baixiaoying Medical AI MCP Server",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Baichuan Medical AI MCP Server - provides medical Q&A, document upload, and evidence-based answers powered by Baichuan-M3-Plus model",
   "long_description": "Baixiaoying MCP Server integrates Baichuan AI's medical large language models (Baichuan-M3-Plus / M2-Plus) into any MCP-compatible client.\n\nCapabilities:\n- Medical Q&A with evidence-based responses and source citations\n- Medical document upload and document-based Q&A\n- File management (upload, list, status check, delete)\n- MCP Apps visual UI support for rich chat results\n\nCompatible with Claude Desktop, Cursor, and all MCP protocol clients.",
   "author": {

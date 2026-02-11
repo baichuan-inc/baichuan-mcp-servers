@@ -1,6 +1,6 @@
 {
   "name": "@baichuan-ai/baixiaoying-mcp-server",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Baixiaoying MCP Server - 百川医学大模型 MCP 服务，支持 MCP Apps，复刻百小应的视觉样式",
   "type": "module",
   "main": "./dist/index.js",

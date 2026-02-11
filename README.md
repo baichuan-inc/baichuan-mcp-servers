@@ -43,12 +43,6 @@
 
 已支持 MCP 最新协议 **MCP APPs**，输出可视化内容，效果与 [百小应](https://ying.ai/?channel=github) 官方 APP 完全对齐。
 
-### 🎁 海纳百川计划
-
-百川推出「海纳百川」计划，**面向所有为医务工作者提供服务的机构，免费提供循证增强的 M3-Plus API**。
-
-👉 [立即申请](https://www.baichuan-ai.com/home)
-
 ---
 
 ## 📦 MCP Servers

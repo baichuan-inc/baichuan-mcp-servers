@@ -47,3 +47,5 @@ prp/
 
 # Security deployment docs (internal only)
 **/docs/security-deployment.md
+
+output/
